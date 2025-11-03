@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Text Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Image Text Generator</h1>
+        
+        <div class="editor">
+            <div class="canvas-container">
+                <canvas id="imageCanvas"></canvas>
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="topText">Top Text:</label>
+                    <input type="text" id="topText" placeholder="Enter top text">
+                </div>
+                
+                <div class="control-group">
+                    <label for="bottomText">Bottom Text:</label>
+                    <input type="text" id="bottomText" placeholder="Enter bottom text">
+                </div>
+                
+                <div class="control-group">
+                    <label for="fontSize">Font Size:</label>
+                    <input type="range" id="fontSize" min="20" max="100" value="40">
+                </div>
+
+                <div class="control-group">
+                    <label for="textColor">Text Color:</label>
+                    <input type="color" id="textColor" value="#ffffff">
+                </div>
+
+                <div class="control-group">
+                    <button id="downloadBtn">Download Image</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
