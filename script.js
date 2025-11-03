@@ -6,13 +6,26 @@ let baseImage = new Image();
 canvas.width = 800;
 canvas.height = 600;
 
-// Initialize base image
-// NOTE: If you host the image on GitHub, use the raw file URL (or host on a CDN) to avoid issues.
-baseImage.crossOrigin = 'anonymous';
-baseImage.src = 'https://github.com/AlexGarySmith/make-zach-say-it/blob/ab661210919c0bfd76c4f76761e9f0ac2af8a716/zach.jpeg';  // Replace with your image path
-baseImage.onload = function() {
-    drawImage();
-};
+// Helper to load an image from a src. If `external` is true, we set crossOrigin to 'anonymous' before
+// assigning the src so the host must serve the image with appropriate CORS headers for toDataURL to work.
+function setBaseImageFromSrc(src, external = false) {
+    const img = new Image();
+    if (external) img.crossOrigin = 'anonymous';
+    img.onload = function() {
+        baseImage = img;
+        drawImage();
+    };
+    img.onerror = function(e) {
+        console.warn('Failed to load image:', e);
+        alert('Failed to load image. Check the image URL or file and try again.');
+    };
+    img.src = src;
+}
+
+// Initialize base image (default). Use raw.githubusercontent URL or any host that sets CORS headers
+// so preview/download works. If you plan to let users upload their own images, uploaded images
+// will be Data URLs and won't require CORS.
+setBaseImageFromSrc('https://raw.githubusercontent.com/AlexGarySmith/make-zach-say-it/main/zach.jpeg', true);
 
 // Get DOM elements
 const topTextInput = document.getElementById('topText');
@@ -22,6 +35,7 @@ const textColorInput = document.getElementById('textColor');
 const downloadBtn = document.getElementById('downloadBtn');
 const previewBtn = document.getElementById('previewBtn');
 const previewImg = document.getElementById('previewImage');
+const imageUpload = document.getElementById('imageUpload');
 
 // Add event listeners
 topTextInput.addEventListener('input', drawImage);
@@ -46,6 +60,29 @@ previewBtn.addEventListener('click', () => {
         alert('Preview not available (cross-origin image may have tainted the canvas).');
     }
 });
+
+// Handle user-uploaded image files
+if (imageUpload) {
+    imageUpload.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            // evt.target.result is a data URL. Data URLs are same-origin and won't taint the canvas.
+            setBaseImageFromSrc(evt.target.result, false);
+        };
+        reader.onerror = function(err) {
+            console.warn('File read error', err);
+            alert('Failed to read file. Try a different image.');
+        };
+        reader.readAsDataURL(file);
+    });
+}
 
 function drawImage() {
     // Clear canvas

@@ -123,3 +123,18 @@ button:hover {
     display: block;
     border-radius: 4px;
 }
+
+/* File input styling */
+.control-group input[type="file"] {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.control-group small {
+    display: block;
+    margin-top: 6px;
+    color: #666;
+}
