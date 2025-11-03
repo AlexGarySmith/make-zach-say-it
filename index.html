@@ -21,7 +21,7 @@
                     <input type="text" id="topText" placeholder="Enter top text">
                 </div>
                 
-                <div class="control-group">
+                    <button id="previewBtn">Preview Image</button>
                     <label for="bottomText">Bottom Text:</label>
                     <input type="text" id="bottomText" placeholder="Enter bottom text">
                 </div>
@@ -29,6 +29,14 @@
                 <div class="control-group">
                     <label for="fontSize">Font Size:</label>
                     <input type="range" id="fontSize" min="20" max="100" value="40">
+        
+        <!-- Live preview area -->
+        <div class="preview-area">
+            <h2>Preview</h2>
+            <div class="preview">
+                <img id="previewImage" alt="Generated preview will appear here">
+            </div>
+        </div>
                 </div>
 
                 <div class="control-group">

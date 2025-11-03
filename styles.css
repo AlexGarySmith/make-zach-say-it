@@ -92,3 +92,34 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+
+/* Preview area */
+.preview-area {
+    margin-top: 20px;
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.preview-area h2 {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+.preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #eee;
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.preview img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 4px;
+}
