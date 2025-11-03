@@ -7,7 +7,7 @@ canvas.width = 800;
 canvas.height = 600;
 
 // Initialize base image
-baseImage.src = 'zach.jpeg';  // Replace with your image path
+baseImage.src = 'https://github.com/AlexGarySmith/make-zach-say-it/blob/main/zach.jpeg';  // Replace with your image path
 baseImage.onload = function() {
     drawImage();
 };
