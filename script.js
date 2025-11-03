@@ -2,6 +2,12 @@ const canvas = document.getElementById('imageCanvas');
 const ctx = canvas.getContext('2d');
 let baseImage = new Image();
 
+// Text position state
+let topTextPosition = { x: 400, y: 60 };
+let bottomTextPosition = { x: 400, y: 540 };
+let isDragging = false;
+let dragTarget = null;
+
 // Set default canvas size
 canvas.width = 800;
 canvas.height = 600;
@@ -13,7 +19,8 @@ function setBaseImageFromSrc(src, external = false) {
     if (external) img.crossOrigin = 'anonymous';
     img.onload = function() {
         baseImage = img;
-        drawImage();
+        drawImage(false);  // Don't add text when just loading image
+        updatePreview(false);  // Show preview without text
     };
     img.onerror = function(e) {
         console.warn('Failed to load image:', e);
@@ -37,29 +44,90 @@ const previewBtn = document.getElementById('previewBtn');
 const previewImg = document.getElementById('previewImage');
 const imageUpload = document.getElementById('imageUpload');
 
+// Helper function to draw a drag handle
+function drawDragHandle(x, y, tooltip) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y - 15, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+}
+
+// Helper function to get mouse position relative to canvas
+function getMousePos(evt) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+        x: (evt.clientX - rect.left) * scaleX,
+        y: (evt.clientY - rect.top) * scaleY
+    };
+}
+
+// Helper function to find if a point is near text position
+function isNearPosition(mousePos, textPos) {
+    const distance = Math.sqrt(
+        Math.pow(mousePos.x - textPos.x, 2) + 
+        Math.pow(mousePos.y - textPos.y, 2)
+    );
+    return distance < 20;
+}
+
 // Add event listeners
-topTextInput.addEventListener('input', drawImage);
-bottomTextInput.addEventListener('input', drawImage);
-fontSizeInput.addEventListener('input', drawImage);
-textColorInput.addEventListener('input', drawImage);
+topTextInput.addEventListener('input', () => {
+    drawImage(true);
+    updatePreview(true);
+});
+bottomTextInput.addEventListener('input', () => {
+    drawImage(true);
+    updatePreview(true);
+});
+fontSizeInput.addEventListener('input', () => {
+    drawImage(true);
+    updatePreview(true);
+});
+textColorInput.addEventListener('input', () => {
+    drawImage(true);
+    updatePreview(true);
+});
 downloadBtn.addEventListener('click', downloadImage);
-previewBtn.addEventListener('click', () => {
-    // Try to open the generated image in a new tab/window
-    try {
-        const data = canvas.toDataURL('image/png');
-        const w = window.open('about:blank', '_blank');
-        if (w) {
-            w.document.write(`<title>Preview</title><img src="${data}" alt="Preview">`);
-            w.document.close();
-        } else {
-            // Popup blocked
-            alert('Unable to open preview in new tab — your browser may be blocking popups.');
-        }
-    } catch (e) {
-        console.warn('Could not open preview (canvas may be tainted):', e);
-        alert('Preview not available (cross-origin image may have tainted the canvas).');
+previewBtn.addEventListener('click', () => updatePreview(true));
+
+// Add drag event listeners
+canvas.addEventListener('mousedown', (e) => {
+    const pos = getMousePos(e);
+    if (isNearPosition(pos, topTextPosition)) {
+        isDragging = true;
+        dragTarget = 'top';
+    } else if (isNearPosition(pos, bottomTextPosition)) {
+        isDragging = true;
+        dragTarget = 'bottom';
     }
 });
+
+canvas.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+        const pos = getMousePos(e);
+        if (dragTarget === 'top') {
+            topTextPosition = pos;
+        } else if (dragTarget === 'bottom') {
+            bottomTextPosition = pos;
+        }
+        drawImage(true);
+        updatePreview(true);
+    }
+});
+
+canvas.addEventListener('mouseup', () => {
+    isDragging = false;
+    dragTarget = null;
+    drawImage(true);
+    updatePreview(true);
+});  // Apply text when Preview clicked
 
 // Handle user-uploaded image files
 if (imageUpload) {
@@ -84,7 +152,8 @@ if (imageUpload) {
     });
 }
 
-function drawImage() {
+// Draw the image and optionally add text
+function drawImage(addText = true) {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -92,7 +161,6 @@ function drawImage() {
     if (!baseImage.complete || baseImage.naturalWidth === 0) {
         ctx.fillStyle = '#ccc';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        if (previewImg) previewImg.src = '';
         return;
     }
 
@@ -103,27 +171,43 @@ function drawImage() {
 
     ctx.drawImage(baseImage, x, y, baseImage.width * scale, baseImage.height * scale);
 
-    // Configure text settings
-    ctx.textAlign = 'center';
-    ctx.fillStyle = textColorInput.value;
-    ctx.strokeStyle = 'black';
-    ctx.lineWidth = 3;
-    ctx.font = `${fontSizeInput.value}px Impact`;
+    if (addText) {
+        // Configure text settings
+        ctx.textAlign = 'center';
+        ctx.fillStyle = textColorInput.value;
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 3;
+        ctx.font = `${fontSizeInput.value}px Impact`;
 
-    // Draw top text
-    const topText = topTextInput.value.toUpperCase();
-    ctx.strokeText(topText, canvas.width / 2, 60);
-    ctx.fillText(topText, canvas.width / 2, 60);
+        // Draw top text
+        const topText = topTextInput.value.toUpperCase();
+        ctx.strokeText(topText, topTextPosition.x, topTextPosition.y);
+        ctx.fillText(topText, topTextPosition.x, topTextPosition.y);
 
-    // Draw bottom text
-    const bottomText = bottomTextInput.value.toUpperCase();
-    ctx.strokeText(bottomText, canvas.width / 2, canvas.height - 20);
-    ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
+        // Draw bottom text
+        const bottomText = bottomTextInput.value.toUpperCase();
+        ctx.strokeText(bottomText, bottomTextPosition.x, bottomTextPosition.y);
+        ctx.fillText(bottomText, bottomTextPosition.x, bottomTextPosition.y);
 
+        // Draw drag handles if not downloading
+        if (!isDragging) {
+            drawDragHandle(topTextPosition.x, topTextPosition.y, 'Top text - Drag to move');
+            drawDragHandle(bottomTextPosition.x, bottomTextPosition.y, 'Bottom text - Drag to move');
+        }
+    }
+}
+
+// Update the preview image with or without text
+function updatePreview(withText = false) {
     // Update live preview image (if available). Use try/catch because canvas may be tainted
     if (previewImg) {
         try {
+            const isDraggingTemp = isDragging;
+            isDragging = true; // Temporarily hide drag handles
+            drawImage(withText);  // Draw with or without text
             previewImg.src = canvas.toDataURL('image/png');
+            isDragging = isDraggingTemp; // Restore drag state
+            drawImage(withText); // Redraw canvas with handles if needed
         } catch (e) {
             // If canvas is tainted (cross-origin), toDataURL will throw. We silently fail and leave preview empty.
             console.warn('Could not update preview image (canvas may be tainted):', e);
@@ -134,10 +218,12 @@ function drawImage() {
 
 function downloadImage() {
     try {
+        drawImage(true);  // Always include text in downloads
         const link = document.createElement('a');
         link.download = 'meme.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
+        drawImage(false);  // Restore canvas to text-free state
     } catch (e) {
         console.warn('Could not download image (canvas may be tainted):', e);
         alert('Unable to download image. Cross-origin image may have tainted the canvas.');
