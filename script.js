@@ -32,7 +32,7 @@ function setBaseImageFromSrc(src, external = false) {
 // Initialize base image (default). Use raw.githubusercontent URL or any host that sets CORS headers
 // so preview/download works. If you plan to let users upload their own images, uploaded images
 // will be Data URLs and won't require CORS.
-setBaseImageFromSrc('https://raw.githubusercontent.com/AlexGarySmith/make-zach-say-it/main/zach.jpeg', true);
+setBaseImageFromSrc('https://raw.githubusercontent.com/AlexGarySmith/make-zach-say-it/79c3ba8a6e1b811ebb7b1cac3e94f8772a6fe93d/zach.jpeg', true);
 
 // Get DOM elements
 const topTextInput = document.getElementById('topText');
