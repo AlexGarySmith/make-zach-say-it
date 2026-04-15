@@ -17,6 +17,7 @@ let textColorInput;
 let downloadBtn;
 let imageUpload;
 
+const RAW_BASE_URL = 'https://raw.githubusercontent.com/AlexGarySmith/make-zach-say-it/HEAD/zimages/';
 const ZIMAGE_LIST = [
     '0c1c1205-bef4-41d5-bcae-df5a873e9a6d.jpg',
     '1f49a476-d6f4-4018-b2dd-8359925c36d1.jpg',
@@ -42,11 +43,11 @@ const ZIMAGE_LIST = [
     'd66b7be4-91bc-4699-ad40-9d382082d299.jpg',
     'e5d260fe-bc05-4d15-8082-cbe7a2bf669e.jpg'
 ];
-const FALLBACK_IMAGE_URL = 'https://raw.githubusercontent.com/AlexGarySmith/make-zach-say-it/79c3ba8a6e1b811ebb7b1cac3e94f8772a6fe93d/zach.jpeg';
+const FALLBACK_IMAGE_URL = 'https://raw.githubusercontent.com/AlexGarySmith/make-zach-say-it/HEAD/zach.jpeg';
 
 function getRandomZimagePath() {
     const index = Math.floor(Math.random() * ZIMAGE_LIST.length);
-    return `zimages/${ZIMAGE_LIST[index]}`;
+    return `${RAW_BASE_URL}${ZIMAGE_LIST[index]}`;
 }
 
 function updateCanvasSize() {
@@ -110,8 +111,8 @@ function initializeApp() {
 
     updateCanvasSize();
     const defaultImagePath = getRandomZimagePath();
-    setBaseImageFromSrc(defaultImagePath, false, () => {
-        console.warn('Local zimages load failed, falling back to remote default image');
+    setBaseImageFromSrc(defaultImagePath, true, () => {
+        console.warn('Random zimages load failed, falling back to remote default image');
         setBaseImageFromSrc(FALLBACK_IMAGE_URL, true);
     });
 
