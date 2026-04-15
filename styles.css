@@ -40,8 +40,10 @@ h1 {
 }
 
 canvas {
+    width: 100%;
     max-width: 100%;
     display: block;
+    touch-action: none;
 }
 
 .controls {
@@ -137,4 +139,55 @@ button:hover {
     display: block;
     margin-top: 6px;
     color: #666;
+}
+
+canvas {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    touch-action: none;
+}
+
+@media (max-width: 900px) {
+    body {
+        padding: 12px;
+    }
+
+    .editor {
+        flex-direction: column;
+        padding: 16px;
+    }
+
+    .controls {
+        width: 100%;
+        padding: 16px;
+    }
+
+    .canvas-container {
+        min-height: 260px;
+    }
+}
+
+@media (max-width: 600px) {
+    h1 {
+        font-size: 1.6rem;
+        margin-bottom: 20px;
+    }
+
+    .container {
+        padding: 0 8px;
+    }
+
+    .control-group {
+        margin-bottom: 16px;
+    }
+
+    button {
+        padding: 12px;
+        font-size: 1rem;
+    }
+
+    .preview {
+        padding: 10px;
+    }
 }

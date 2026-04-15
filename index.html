@@ -9,40 +9,26 @@
 <body>
     <div class="container">
         <h1>Image Text Generator</h1>
-        
+
         <div class="editor">
             <div class="canvas-container">
                 <canvas id="imageCanvas"></canvas>
             </div>
-            
+
             <div class="controls">
                 <div class="control-group">
-                        <label for="topText">Top Text:</label>
-                        <input type="text" id="topText" placeholder="Enter top text">
+                    <label for="topText">Top Text:</label>
+                    <input type="text" id="topText" placeholder="Enter top text">
                 </div>
-                
-                    <div class="control-group">
-                        <label for="imageUpload">Upload Image:</label>
-                        <input type="file" id="imageUpload" accept="image/*">
-                        <small>Or use the preset image included with the page.</small>
-                    </div>
-                
-                    <button id="previewBtn">Preview Image</button>
+
+                <div class="control-group">
                     <label for="bottomText">Bottom Text:</label>
                     <input type="text" id="bottomText" placeholder="Enter bottom text">
                 </div>
-                
+
                 <div class="control-group">
                     <label for="fontSize">Font Size:</label>
                     <input type="range" id="fontSize" min="20" max="100" value="40">
-        
-        <!-- Live preview area -->
-        <div class="preview-area">
-            <h2>Preview</h2>
-            <div class="preview">
-                <img id="previewImage" alt="Generated preview will appear here">
-            </div>
-        </div>
                 </div>
 
                 <div class="control-group">
@@ -51,8 +37,25 @@
                 </div>
 
                 <div class="control-group">
-                    <button id="downloadBtn">Download Image</button>
+                    <label for="imageUpload">Upload Image:</label>
+                    <input type="file" id="imageUpload" accept="image/*">
+                    <small>Or use the preset image included with the page.</small>
                 </div>
+
+                <div class="control-group">
+                    <button id="previewBtn" type="button">Preview Image</button>
+                </div>
+
+                <div class="control-group">
+                    <button id="downloadBtn" type="button">Download Image</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="preview-area">
+            <h2>Preview</h2>
+            <div class="preview">
+                <img id="previewImage" alt="Generated preview will appear here">
             </div>
         </div>
     </div>
