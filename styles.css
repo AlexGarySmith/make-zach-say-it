@@ -39,7 +39,6 @@ h1 {
     background-color: #ddd;
     border-radius: 4px;
     overflow: hidden;
-    min-height: 300px;
 }
 
 canvas {
@@ -140,7 +139,6 @@ canvas {
 
     .canvas-container {
         order: -1;
-        min-height: 280px;
     }
 
     .controls {

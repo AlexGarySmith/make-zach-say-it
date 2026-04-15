@@ -18,6 +18,7 @@ let isDragging = false;
 let dragTarget = null;
 let hoveredTextTarget = null;
 let gestureState = null;
+let scrollAnimationFrame = null;
 let canvasContainer;
 
 let topTextInput;
@@ -135,6 +136,14 @@ function pointInTextBox(point, text, settings, extraMargin = 0) {
 
 function getDistance(a, b) {
     return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function scheduleRedraw() {
+    if (scrollAnimationFrame !== null) return;
+    scrollAnimationFrame = requestAnimationFrame(() => {
+        drawImage(true);
+        scrollAnimationFrame = null;
+    });
 }
 
 function getTouchPositions(touches) {
@@ -499,6 +508,8 @@ function initializeApp() {
     }
 
     window.addEventListener('resize', updateCanvasSize);
+    window.addEventListener('orientationchange', updateCanvasSize);
+    window.addEventListener('scroll', scheduleRedraw, { passive: true });
 }
 
 if (document.readyState === 'loading') {
