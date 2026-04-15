@@ -30,34 +30,13 @@ let imageUpload;
 
 const RAW_BASE_URL = 'https://alexgarysmith.github.io/make-zach-say-it/zimages/';
 const ZIMAGE_API_URL = 'https://api.github.com/repos/alexgarysmith/make-zach-say-it/contents/zimages';
-const ZIMAGE_LIST = [
-    '0c1c1205-bef4-41d5-bcae-df5a873e9a6d.jpg',
-    '1f49a476-d6f4-4018-b2dd-8359925c36d1.jpg',
-    '20350224-f7d3-48dc-aede-9cfc689c0335.jpg',
-    '2deaf793-8355-40b4-a8dc-039b823ccd9c.jpg',
-    '374e1e98-6e24-4af7-8330-1b37905619f1.jpg',
-    '4788a04e-0b4b-495c-9620-092247b368dc.jpg',
-    '5009339e-45b0-4885-8635-44d327734a41.jpg',
-    '5856fa08-b9ae-432f-af1a-c3b82e440468.jpg',
-    '59573787-bd23-4e61-a449-97fc53768447.jpg',
-    '62b9ae4c-c791-4e9e-9b83-95a290f8687b.jpg',
-    '6a250531-ab57-4391-8f16-3299b6194398.jpg',
-    '6df39a98-7251-4b38-a471-7a928608f5f7.jpg',
-    '756faf3d-ea97-4589-a277-9189748bdf9f.jpg',
-    '7b181b80-3110-4dd4-8c4f-5542c50d2016.jpg',
-    '8f769bfe-3298-4880-aa04-40b6c741fe0c.jpg',
-    '9116bf37-c6f6-4b9f-871c-b785f21b70b8.jpg',
-    '98c83554-e8eb-4a52-850c-e7d18424d941.jpg',
-    'a3c218de-3f35-449b-9355-25f8ba562b21.jpg',
-    'a5ede5cb-02e9-47bf-aec6-e094a2d71bfc.jpg',
-    'b178c79b-4a27-4bd0-9057-83789bd2c45b.jpg',
-    'd5e07d74-faad-4a9a-9e6f-fe317ef9b542.jpg',
-    'd66b7be4-91bc-4699-ad40-9d382082d299.jpg',
-    'e5d260fe-bc05-4d15-8082-cbe7a2bf669e.jpg'
-];
-const FALLBACK_IMAGE_URL = 'https://alexgarysmith.github.io/make-zach-say-it/zach.jpeg';
+const ZIMAGE_LIST = [];
+const FALLBACK_IMAGE_URL = `${RAW_BASE_URL}2deaf793-8355-40b4-a8dc-039b823ccd9c.jpg`;
 
 function getRandomZimagePath() {
+    if (ZIMAGE_LIST.length === 0) {
+        return FALLBACK_IMAGE_URL;
+    }
     const index = Math.floor(Math.random() * ZIMAGE_LIST.length);
     return `${RAW_BASE_URL}${ZIMAGE_LIST[index]}`;
 }
@@ -123,7 +102,7 @@ function loadZimageGallery() {
             updateGallerySelection(baseImage.src);
         })
         .catch(() => {
-            const imageUrls = ZIMAGE_LIST.map((name) => `${RAW_BASE_URL}${name}`);
+            const imageUrls = ZIMAGE_LIST.length ? ZIMAGE_LIST.map((name) => `${RAW_BASE_URL}${name}`) : [FALLBACK_IMAGE_URL];
             buildZimageGallery(imageUrls);
             updateGallerySelection(baseImage.src);
         });
