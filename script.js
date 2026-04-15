@@ -17,6 +17,7 @@ let textBoxes = {
 let isDragging = false;
 let dragTarget = null;
 let hoveredTextTarget = null;
+let gestureState = null;
 let canvasContainer;
 
 let topTextInput;
@@ -134,6 +135,52 @@ function pointInTextBox(point, text, settings, extraMargin = 0) {
 
 function getDistance(a, b) {
     return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function getTouchPositions(touches) {
+    return Array.from(touches).map((touch) => getMousePos(touch));
+}
+
+function getMidpoint(a, b) {
+    return {
+        x: (a.x + b.x) / 2,
+        y: (a.y + b.y) / 2
+    };
+}
+
+function getAngle(a, b) {
+    return Math.atan2(b.y - a.y, b.x - a.x);
+}
+
+function findGestureTarget(positions) {
+    const topText = topTextInput.value.toUpperCase();
+    const bottomText = bottomTextInput.value.toUpperCase();
+    const topBox = textBoxes.top;
+    const bottomBox = textBoxes.bottom;
+    const topDims = topText ? getTextBoxData(topText, topBox) : null;
+    const bottomDims = bottomText ? getTextBoxData(bottomText, bottomBox) : null;
+    const topHandles = topDims ? getTextHandlePositions(topBox, topDims) : null;
+    const bottomHandles = bottomDims ? getTextHandlePositions(bottomBox, bottomDims) : null;
+
+    const midpoint = getMidpoint(positions[0], positions[1]);
+    const topScore = topText ? (
+        (pointInTextBox(midpoint, topText, topBox, HANDLE_HOVER_MARGIN) ? 0 : 1000) +
+        Math.min(
+            getDistance(midpoint, topHandles.rotate),
+            getDistance(midpoint, topHandles.resize)
+        )
+    ) : Infinity;
+
+    const bottomScore = bottomText ? (
+        (pointInTextBox(midpoint, bottomText, bottomBox, HANDLE_HOVER_MARGIN) ? 0 : 1000) +
+        Math.min(
+            getDistance(midpoint, bottomHandles.rotate),
+            getDistance(midpoint, bottomHandles.resize)
+        )
+    ) : Infinity;
+
+    if (topScore === Infinity && bottomScore === Infinity) return null;
+    return topScore <= bottomScore ? 'top' : 'bottom';
 }
 
 function updateHoverTarget(mousePos) {
@@ -295,6 +342,27 @@ function initializeApp() {
         });
 
         canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                const positions = getTouchPositions(e.touches);
+                const target = findGestureTarget(positions);
+                if (target) {
+                    const midpoint = getMidpoint(positions[0], positions[1]);
+                    const startAngle = getAngle(positions[0], positions[1]);
+                    const startDistance = Math.max(1, getDistance(positions[0], positions[1]));
+
+                    gestureState = {
+                        target,
+                        startAngle,
+                        startDistance,
+                        startMidpoint: midpoint,
+                        startBox: { ...textBoxes[target] }
+                    };
+                    hoveredTextTarget = target;
+                    e.preventDefault();
+                    return;
+                }
+            }
+
             const pos = getEventPos(e);
             const topText = topTextInput.value.toUpperCase();
             const bottomText = bottomTextInput.value.toUpperCase();
@@ -333,6 +401,30 @@ function initializeApp() {
         });
 
         canvas.addEventListener('touchmove', (e) => {
+            if (gestureState && e.touches.length === 2) {
+                const positions = getTouchPositions(e.touches);
+                const midpoint = getMidpoint(positions[0], positions[1]);
+                const currentAngle = getAngle(positions[0], positions[1]);
+                const currentDistance = Math.max(1, getDistance(positions[0], positions[1]));
+                const deltaAngle = currentAngle - gestureState.startAngle;
+                const scale = currentDistance / gestureState.startDistance;
+
+                const target = gestureState.target;
+                const box = textBoxes[target];
+                const newWidth = Math.max(MIN_WIDTH_RATIO, Math.min(MAX_WIDTH_RATIO, gestureState.startBox.width * scale));
+                const deltaX = midpoint.x - gestureState.startMidpoint.x;
+                const deltaY = midpoint.y - gestureState.startMidpoint.y;
+
+                box.width = newWidth;
+                box.angle = gestureState.startBox.angle + deltaAngle;
+                box.x = Math.min(1, Math.max(0, gestureState.startBox.x + deltaX / canvas.width));
+                box.y = Math.min(1, Math.max(0, gestureState.startBox.y + deltaY / canvas.height));
+
+                drawImage(true);
+                e.preventDefault();
+                return;
+            }
+
             if (isDragging && dragTarget) {
                 const pos = getEventPos(e);
                 const target = dragTarget.split('-')[0];
@@ -358,12 +450,14 @@ function initializeApp() {
         canvas.addEventListener('touchend', () => {
             isDragging = false;
             dragTarget = null;
+            gestureState = null;
             drawImage(true);
         });
 
         canvas.addEventListener('touchcancel', () => {
             isDragging = false;
             dragTarget = null;
+            gestureState = null;
         });
     }
 
