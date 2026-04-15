@@ -3,9 +3,16 @@ let ctx;
 let baseImage = new Image();
 let canvasAspectRatio = 4 / 3;
 
-// Text position state as ratios so positions scale with the canvas.
-let topTextPosition = { x: 0.5, y: 0.12 };
-let bottomTextPosition = { x: 0.5, y: 0.88 };
+const BASE_FONT_SIZE = 40;
+const HANDLE_RADIUS = 8;
+const HANDLE_PADDING = 12;
+const MIN_WIDTH_RATIO = 0.25;
+const MAX_WIDTH_RATIO = 0.95;
+
+let textBoxes = {
+    top: { x: 0.5, y: 0.12, width: 0.7, angle: 0 },
+    bottom: { x: 0.5, y: 0.88, width: 0.7, angle: 0 }
+};
 let isDragging = false;
 let dragTarget = null;
 let hoveredTextTarget = null;
@@ -13,7 +20,6 @@ let canvasContainer;
 
 let topTextInput;
 let bottomTextInput;
-let fontSizeInput;
 let textColorInput;
 let downloadBtn;
 let imageUpload;
@@ -65,32 +71,81 @@ function updateCanvasSize() {
     }
 }
 
-function getTextBounds(text, position) {
-    const fontSize = parseInt(fontSizeInput?.value || 40, 10) || 40;
+function getFontSizeForText(text, targetWidth) {
+    const fontSize = BASE_FONT_SIZE;
     ctx.font = `${fontSize}px Impact`;
-    const metrics = ctx.measureText(text);
-    const width = metrics.width;
-    const height = fontSize * 1.2;
-    const left = position.x - width / 2 - 12;
-    const right = position.x + width / 2 + 12;
-    const top = position.y - height - 6;
-    const bottom = position.y + 6;
-    return { left, right, top, bottom };
+    const measured = ctx.measureText(text).width || 1;
+    return Math.max(12, Math.min(200, fontSize * targetWidth / measured));
 }
 
-function isWithinBounds(point, bounds) {
-    return point.x >= bounds.left && point.x <= bounds.right && point.y >= bounds.top && point.y <= bounds.bottom;
+function getTextBoxData(text, settings) {
+    const targetWidth = settings.width * canvas.width;
+    const fontSize = getFontSizeForText(text, targetWidth);
+    ctx.font = `${fontSize}px Impact`;
+    const metrics = ctx.measureText(text);
+    const textWidth = metrics.width;
+    const textHeight = fontSize * 1.2;
+    return {
+        fontSize,
+        textWidth,
+        textHeight,
+        halfWidth: textWidth / 2 + HANDLE_PADDING,
+        halfHeight: textHeight / 2 + HANDLE_PADDING
+    };
+}
+
+function rotatePoint(point, center, angle) {
+    const dx = point.x - center.x;
+    const dy = point.y - center.y;
+    return {
+        x: dx * Math.cos(angle) - dy * Math.sin(angle),
+        y: dx * Math.sin(angle) + dy * Math.cos(angle)
+    };
+}
+
+function getTextHandlePositions(settings, dims) {
+    const center = ratioToPixels(settings);
+    const resizeLocal = { x: dims.halfWidth, y: 0 };
+    const rotateLocal = { x: 0, y: -dims.halfHeight - 20 };
+    return {
+        resize: {
+            x: center.x + resizeLocal.x * Math.cos(settings.angle) - resizeLocal.y * Math.sin(settings.angle),
+            y: center.y + resizeLocal.x * Math.sin(settings.angle) + resizeLocal.y * Math.cos(settings.angle)
+        },
+        rotate: {
+            x: center.x + rotateLocal.x * Math.cos(settings.angle) - rotateLocal.y * Math.sin(settings.angle),
+            y: center.y + rotateLocal.x * Math.sin(settings.angle) + rotateLocal.y * Math.cos(settings.angle)
+        }
+    };
+}
+
+function pointInTextBox(point, text, settings) {
+    const center = ratioToPixels(settings);
+    const local = rotatePoint(point, center, -settings.angle);
+    const dims = getTextBoxData(text, settings);
+    return (
+        local.x >= -dims.halfWidth &&
+        local.x <= dims.halfWidth &&
+        local.y >= -dims.halfHeight &&
+        local.y <= dims.halfHeight
+    );
+}
+
+function getDistance(a, b) {
+    return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
 function updateHoverTarget(mousePos) {
     const topText = topTextInput.value.toUpperCase();
     const bottomText = bottomTextInput.value.toUpperCase();
-    const topBounds = getTextBounds(topText, ratioToPixels(topTextPosition));
-    const bottomBounds = getTextBounds(bottomText, ratioToPixels(bottomTextPosition));
+    const topBox = textBoxes.top;
+    const bottomBox = textBoxes.bottom;
+    const topHit = topText && pointInTextBox(mousePos, topText, topBox);
+    const bottomHit = bottomText && pointInTextBox(mousePos, bottomText, bottomBox);
 
-    if (topText && isWithinBounds(mousePos, topBounds)) {
+    if (topHit) {
         hoveredTextTarget = 'top';
-    } else if (bottomText && isWithinBounds(mousePos, bottomBounds)) {
+    } else if (bottomHit) {
         hoveredTextTarget = 'bottom';
     } else {
         hoveredTextTarget = null;
@@ -118,14 +173,13 @@ function setBaseImageFromSrc(src, external = false, onErrorFallback) {
     img.src = src;
 }
 
-// Helper function to draw a drag handle
-function drawDragHandle(x, y, tooltip) {
+function drawDragHandle(x, y) {
     ctx.save();
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.strokeStyle = '#000';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(x, y - 15, 5, 0, Math.PI * 2);
+    ctx.arc(x, y, HANDLE_RADIUS, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
@@ -137,7 +191,6 @@ function initializeApp() {
     canvasContainer = document.querySelector('.canvas-container');
     topTextInput = document.getElementById('topText');
     bottomTextInput = document.getElementById('bottomText');
-    fontSizeInput = document.getElementById('fontSize');
     textColorInput = document.getElementById('textColor');
     downloadBtn = document.getElementById('downloadBtn');
     imageUpload = document.getElementById('imageUpload');
@@ -151,7 +204,6 @@ function initializeApp() {
 
     if (topTextInput) topTextInput.addEventListener('input', () => drawImage(true));
     if (bottomTextInput) bottomTextInput.addEventListener('input', () => drawImage(true));
-    if (fontSizeInput) fontSizeInput.addEventListener('input', () => drawImage(true));
     if (textColorInput) textColorInput.addEventListener('input', () => drawImage(true));
     if (downloadBtn) downloadBtn.addEventListener('click', downloadImage);
 
@@ -160,26 +212,51 @@ function initializeApp() {
             const pos = getMousePos(e);
             const topText = topTextInput.value.toUpperCase();
             const bottomText = bottomTextInput.value.toUpperCase();
-            const topBounds = getTextBounds(topText, ratioToPixels(topTextPosition));
-            const bottomBounds = getTextBounds(bottomText, ratioToPixels(bottomTextPosition));
+            const topBox = textBoxes.top;
+            const bottomBox = textBoxes.bottom;
+            const topDims = getTextBoxData(topText, topBox);
+            const bottomDims = getTextBoxData(bottomText, bottomBox);
+            const topHandles = getTextHandlePositions(topBox, topDims);
+            const bottomHandles = getTextHandlePositions(bottomBox, bottomDims);
 
-            if (topText && isWithinBounds(pos, topBounds)) {
+            if (topText && getDistance(pos, topHandles.rotate) < HANDLE_RADIUS * 1.5) {
                 isDragging = true;
-                dragTarget = 'top';
-            } else if (bottomText && isWithinBounds(pos, bottomBounds)) {
+                dragTarget = 'top-rotate';
+            } else if (topText && getDistance(pos, topHandles.resize) < HANDLE_RADIUS * 1.5) {
                 isDragging = true;
-                dragTarget = 'bottom';
+                dragTarget = 'top-resize';
+            } else if (topText && pointInTextBox(pos, topText, topBox)) {
+                isDragging = true;
+                dragTarget = 'top-move';
+            } else if (bottomText && getDistance(pos, bottomHandles.rotate) < HANDLE_RADIUS * 1.5) {
+                isDragging = true;
+                dragTarget = 'bottom-rotate';
+            } else if (bottomText && getDistance(pos, bottomHandles.resize) < HANDLE_RADIUS * 1.5) {
+                isDragging = true;
+                dragTarget = 'bottom-resize';
+            } else if (bottomText && pointInTextBox(pos, bottomText, bottomBox)) {
+                isDragging = true;
+                dragTarget = 'bottom-move';
             }
         });
 
         canvas.addEventListener('mousemove', (e) => {
             const pos = getMousePos(e);
-            if (isDragging) {
-                const ratio = pixelsToRatio(pos);
-                if (dragTarget === 'top') {
-                    topTextPosition = ratio;
-                } else if (dragTarget === 'bottom') {
-                    bottomTextPosition = ratio;
+            if (isDragging && dragTarget) {
+                const target = dragTarget.split('-')[0];
+                const mode = dragTarget.split('-')[1];
+                const box = textBoxes[target];
+                const center = ratioToPixels(box);
+                const local = rotatePoint(pos, center, -box.angle);
+
+                if (mode === 'move') {
+                    textBoxes[target].x = pixelsToRatio(pos).x;
+                    textBoxes[target].y = pixelsToRatio(pos).y;
+                } else if (mode === 'resize') {
+                    const newWidth = Math.max(MIN_WIDTH_RATIO, Math.min(MAX_WIDTH_RATIO, (Math.abs(local.x) + HANDLE_PADDING) * 2 / canvas.width));
+                    textBoxes[target].width = newWidth;
+                } else if (mode === 'rotate') {
+                    textBoxes[target].angle = Math.atan2(pos.y - center.y, pos.x - center.x) + Math.PI / 2;
                 }
                 drawImage(true);
             } else {
@@ -201,25 +278,59 @@ function initializeApp() {
 
         canvas.addEventListener('touchstart', (e) => {
             const pos = getEventPos(e);
-            if (isNearPosition(pos, ratioToPixels(topTextPosition))) {
+            const topText = topTextInput.value.toUpperCase();
+            const bottomText = bottomTextInput.value.toUpperCase();
+            const topBox = textBoxes.top;
+            const bottomBox = textBoxes.bottom;
+            const topDims = getTextBoxData(topText, topBox);
+            const bottomDims = getTextBoxData(bottomText, bottomBox);
+            const topHandles = getTextHandlePositions(topBox, topDims);
+            const bottomHandles = getTextHandlePositions(bottomBox, bottomDims);
+
+            if (topText && getDistance(pos, topHandles.rotate) < HANDLE_RADIUS * 1.5) {
                 isDragging = true;
-                dragTarget = 'top';
+                dragTarget = 'top-rotate';
                 e.preventDefault();
-            } else if (isNearPosition(pos, ratioToPixels(bottomTextPosition))) {
+            } else if (topText && getDistance(pos, topHandles.resize) < HANDLE_RADIUS * 1.5) {
                 isDragging = true;
-                dragTarget = 'bottom';
+                dragTarget = 'top-resize';
+                e.preventDefault();
+            } else if (topText && pointInTextBox(pos, topText, topBox)) {
+                isDragging = true;
+                dragTarget = 'top-move';
+                e.preventDefault();
+            } else if (bottomText && getDistance(pos, bottomHandles.rotate) < HANDLE_RADIUS * 1.5) {
+                isDragging = true;
+                dragTarget = 'bottom-rotate';
+                e.preventDefault();
+            } else if (bottomText && getDistance(pos, bottomHandles.resize) < HANDLE_RADIUS * 1.5) {
+                isDragging = true;
+                dragTarget = 'bottom-resize';
+                e.preventDefault();
+            } else if (bottomText && pointInTextBox(pos, bottomText, bottomBox)) {
+                isDragging = true;
+                dragTarget = 'bottom-move';
                 e.preventDefault();
             }
         });
 
         canvas.addEventListener('touchmove', (e) => {
-            if (isDragging) {
+            if (isDragging && dragTarget) {
                 const pos = getEventPos(e);
-                const ratio = pixelsToRatio(pos);
-                if (dragTarget === 'top') {
-                    topTextPosition = ratio;
-                } else if (dragTarget === 'bottom') {
-                    bottomTextPosition = ratio;
+                const target = dragTarget.split('-')[0];
+                const mode = dragTarget.split('-')[1];
+                const box = textBoxes[target];
+                const center = ratioToPixels(box);
+                const local = rotatePoint(pos, center, -box.angle);
+
+                if (mode === 'move') {
+                    textBoxes[target].x = pixelsToRatio(pos).x;
+                    textBoxes[target].y = pixelsToRatio(pos).y;
+                } else if (mode === 'resize') {
+                    const newWidth = Math.max(MIN_WIDTH_RATIO, Math.min(MAX_WIDTH_RATIO, (Math.abs(local.x) + HANDLE_PADDING) * 2 / canvas.width));
+                    textBoxes[target].width = newWidth;
+                } else if (mode === 'rotate') {
+                    textBoxes[target].angle = Math.atan2(pos.y - center.y, pos.x - center.x) + Math.PI / 2;
                 }
                 drawImage(true);
                 e.preventDefault();
@@ -312,13 +423,35 @@ function pixelsToRatio(position) {
     };
 }
 
-// Helper function to find if a point is near text position
-function isNearPosition(mousePos, textPos) {
-    const distance = Math.sqrt(
-        Math.pow(mousePos.x - textPos.x, 2) + 
-        Math.pow(mousePos.y - textPos.y, 2)
-    );
-    return distance < 20;
+// Draw the text box with handles and optional controls
+function drawTextBox(key, text, settings, showHandles) {
+    if (!text) return;
+
+    const dims = getTextBoxData(text, settings);
+    const center = ratioToPixels(settings);
+
+    ctx.save();
+    ctx.translate(center.x, center.y);
+    ctx.rotate(settings.angle);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const isActive = hoveredTextTarget === key || (dragTarget && dragTarget.startsWith(`${key}-`));
+    if (showHandles && isActive) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-dims.halfWidth, -dims.halfHeight, dims.halfWidth * 2, dims.halfHeight * 2);
+        drawDragHandle(dims.halfWidth, 0);
+        drawDragHandle(0, -dims.halfHeight - 20);
+    }
+
+    ctx.font = `${dims.fontSize}px Impact`;
+    ctx.fillStyle = textColorInput.value;
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 3;
+    ctx.strokeText(text, 0, 0);
+    ctx.fillText(text, 0, 0);
+    ctx.restore();
 }
 
 // Draw the image and optionally add text
@@ -341,35 +474,10 @@ function drawImage(addText = true, showHandles = true) {
     ctx.drawImage(baseImage, x, y, baseImage.width * scale, baseImage.height * scale);
 
     if (addText) {
-        // Configure text settings
-        ctx.textAlign = 'center';
-        ctx.fillStyle = textColorInput.value;
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 3;
-        ctx.font = `${fontSizeInput.value}px Impact`;
-
-        // Convert ratio-based positions to actual canvas pixels
-        const topPos = ratioToPixels(topTextPosition);
-        const bottomPos = ratioToPixels(bottomTextPosition);
-
-        // Draw top text
         const topText = topTextInput.value.toUpperCase();
-        ctx.strokeText(topText, topPos.x, topPos.y);
-        ctx.fillText(topText, topPos.x, topPos.y);
-
-        // Draw bottom text
         const bottomText = bottomTextInput.value.toUpperCase();
-        ctx.strokeText(bottomText, bottomPos.x, bottomPos.y);
-        ctx.fillText(bottomText, bottomPos.x, bottomPos.y);
-
-        // Draw drag handle only when hovering and not dragging
-        if (showHandles && !isDragging && hoveredTextTarget) {
-            if (hoveredTextTarget === 'top') {
-                drawDragHandle(topPos.x, topPos.y, 'Top text - Drag to move');
-            } else if (hoveredTextTarget === 'bottom') {
-                drawDragHandle(bottomPos.x, bottomPos.y, 'Bottom text - Drag to move');
-            }
-        }
+        drawTextBox('top', topText, textBoxes.top, showHandles);
+        drawTextBox('bottom', bottomText, textBoxes.bottom, showHandles);
     }
 }
 
