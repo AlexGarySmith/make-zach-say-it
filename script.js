@@ -65,10 +65,32 @@ function updateCanvasSize() {
     }
 }
 
+function getTextBounds(text, position) {
+    const fontSize = parseInt(fontSizeInput?.value || 40, 10) || 40;
+    ctx.font = `${fontSize}px Impact`;
+    const metrics = ctx.measureText(text);
+    const width = metrics.width;
+    const height = fontSize * 1.2;
+    const left = position.x - width / 2 - 12;
+    const right = position.x + width / 2 + 12;
+    const top = position.y - height - 6;
+    const bottom = position.y + 6;
+    return { left, right, top, bottom };
+}
+
+function isWithinBounds(point, bounds) {
+    return point.x >= bounds.left && point.x <= bounds.right && point.y >= bounds.top && point.y <= bounds.bottom;
+}
+
 function updateHoverTarget(mousePos) {
-    if (isNearPosition(mousePos, ratioToPixels(topTextPosition))) {
+    const topText = topTextInput.value.toUpperCase();
+    const bottomText = bottomTextInput.value.toUpperCase();
+    const topBounds = getTextBounds(topText, ratioToPixels(topTextPosition));
+    const bottomBounds = getTextBounds(bottomText, ratioToPixels(bottomTextPosition));
+
+    if (topText && isWithinBounds(mousePos, topBounds)) {
         hoveredTextTarget = 'top';
-    } else if (isNearPosition(mousePos, ratioToPixels(bottomTextPosition))) {
+    } else if (bottomText && isWithinBounds(mousePos, bottomBounds)) {
         hoveredTextTarget = 'bottom';
     } else {
         hoveredTextTarget = null;
@@ -136,10 +158,15 @@ function initializeApp() {
     if (canvas) {
         canvas.addEventListener('mousedown', (e) => {
             const pos = getMousePos(e);
-            if (isNearPosition(pos, ratioToPixels(topTextPosition))) {
+            const topText = topTextInput.value.toUpperCase();
+            const bottomText = bottomTextInput.value.toUpperCase();
+            const topBounds = getTextBounds(topText, ratioToPixels(topTextPosition));
+            const bottomBounds = getTextBounds(bottomText, ratioToPixels(bottomTextPosition));
+
+            if (topText && isWithinBounds(pos, topBounds)) {
                 isDragging = true;
                 dragTarget = 'top';
-            } else if (isNearPosition(pos, ratioToPixels(bottomTextPosition))) {
+            } else if (bottomText && isWithinBounds(pos, bottomBounds)) {
                 isDragging = true;
                 dragTarget = 'bottom';
             }
@@ -348,7 +375,7 @@ function drawImage(addText = true, showHandles = true) {
 
 function downloadImage() {
     try {
-        drawImage(true, false);  // Always include text, but never show UI handles in downloads
+        drawImage(true, false);  // Always include text in downloads, but hide UI handles
         const link = document.createElement('a');
         link.download = 'meme.png';
         link.href = canvas.toDataURL('image/png');
