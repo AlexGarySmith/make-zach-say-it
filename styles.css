@@ -181,6 +181,21 @@ canvas {
         margin-bottom: 16px;
     }
 
+    .control-row {
+        grid-template-columns: 1fr auto;
+        gap: 10px 12px;
+    }
+
+    .color-item {
+        width: 100px;
+        min-width: 100px;
+    }
+
+    input[type="color"] {
+        width: 40px;
+        height: 28px;
+    }
+
     button {
         padding: 12px;
         font-size: 1rem;
