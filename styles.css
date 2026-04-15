@@ -39,6 +39,9 @@ h1 {
     background-color: #ddd;
     border-radius: 4px;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 canvas {
@@ -47,6 +50,7 @@ canvas {
     height: auto;
     display: block;
     touch-action: none;
+    align-self: center;
 }
 
 .controls {
