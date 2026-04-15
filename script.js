@@ -46,22 +46,28 @@ function buildZimageGallery(imageUrls) {
     if (!gallery) return;
 
     gallery.innerHTML = '';
-    imageUrls.forEach((url, index) => {
+    imageUrls.forEach((url) => {
         const card = document.createElement('div');
         card.className = 'zimage-card';
         card.setAttribute('data-zimage-src', url);
 
         const image = document.createElement('img');
         image.src = url;
-        image.alt = `Zach image ${index + 1}`;
-
-        const label = document.createElement('span');
-        label.textContent = `Zach image ${index + 1}`;
+        image.alt = 'Zach image';
 
         card.appendChild(image);
-        card.appendChild(label);
         gallery.appendChild(card);
     });
+}
+
+function scrollCarousel(direction = 1) {
+    const track = document.querySelector('.zimage-carousel-track');
+    if (!track) return;
+
+    const card = track.querySelector('.zimage-card');
+    const gap = 12;
+    const scrollAmount = (card ? card.offsetWidth : 220) + gap;
+    track.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
 }
 
 function updateGallerySelection(selectedUrl) {
@@ -332,6 +338,11 @@ function initializeApp() {
     if (topTextColorInput) topTextColorInput.addEventListener('input', () => drawImage(true));
     if (bottomTextColorInput) bottomTextColorInput.addEventListener('input', () => drawImage(true));
     if (downloadBtn) downloadBtn.addEventListener('click', downloadImage);
+
+    const carouselPrev = document.querySelector('.carousel-arrow.prev');
+    const carouselNext = document.querySelector('.carousel-arrow.next');
+    if (carouselPrev) carouselPrev.addEventListener('click', () => scrollCarousel(-1));
+    if (carouselNext) carouselNext.addEventListener('click', () => scrollCarousel(1));
 
     if (canvas) {
         canvas.addEventListener('mousedown', (e) => {

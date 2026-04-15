@@ -127,18 +127,39 @@ input[type="color"] {
     padding: 0;
 }
 
-.zimage-gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 12px;
+.zimage-carousel {
+    position: relative;
     margin-top: 16px;
+}
+
+.zimage-carousel-track-wrapper {
+    overflow: hidden;
+    padding: 0 58px;
+}
+
+.zimage-carousel-track {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding-bottom: 4px;
+}
+
+.zimage-carousel-track::-webkit-scrollbar {
+    height: 10px;
+}
+
+.zimage-carousel-track::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 999px;
 }
 
 .zimage-card {
     cursor: pointer;
+    flex: 0 0 clamp(180px, 22vw, 240px);
     overflow: hidden;
     border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: 12px;
     background: #fff;
     transition: border-color 0.2s, transform 0.2s;
 }
@@ -155,12 +176,37 @@ input[type="color"] {
     height: auto;
 }
 
-.zimage-card span {
-    display: block;
-    padding: 8px;
-    font-size: 0.9rem;
-    text-align: center;
+.carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(150, 150, 150, 0.7);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.75);
     color: #333;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+    z-index: 2;
+}
+
+.carousel-arrow.prev {
+    left: 8px;
+}
+
+.carousel-arrow.next {
+    right: 8px;
+}
+
+.carousel-arrow:hover {
+    background-color: rgba(240, 240, 240, 0.9);
+    border-color: rgba(120, 120, 120, 0.85);
+    transform: translateY(-50%) scale(1.03);
 }
 
 button {
