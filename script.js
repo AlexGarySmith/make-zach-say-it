@@ -21,7 +21,6 @@ function updateCanvasSize() {
 
     if (resized) {
         drawImage(true);
-        updatePreview(true);
     }
 }
 
@@ -35,7 +34,6 @@ function setBaseImageFromSrc(src, external = false) {
         canvasAspectRatio = img.height / img.width || canvasAspectRatio;
         updateCanvasSize();
         drawImage(false);  // Don't add text when just loading image
-        updatePreview(false);  // Show preview without text
     };
     img.onerror = function(e) {
         console.warn('Failed to load image:', e);
@@ -44,9 +42,8 @@ function setBaseImageFromSrc(src, external = false) {
     img.src = src;
 }
 
-// Initialize base image (default). Use raw.githubusercontent URL or any host that sets CORS headers
-// so preview/download works. If you plan to let users upload their own images, uploaded images
-// will be Data URLs and won't require CORS.
+// Initialize base image (default). Use a host that sets CORS headers
+// so downloads work. Uploaded files are Data URLs and won't require CORS.
 setBaseImageFromSrc('https://raw.githubusercontent.com/AlexGarySmith/make-zach-say-it/79c3ba8a6e1b811ebb7b1cac3e94f8772a6fe93d/zach.jpeg', true);
 
 // Get DOM elements
@@ -55,8 +52,6 @@ const bottomTextInput = document.getElementById('bottomText');
 const fontSizeInput = document.getElementById('fontSize');
 const textColorInput = document.getElementById('textColor');
 const downloadBtn = document.getElementById('downloadBtn');
-const previewBtn = document.getElementById('previewBtn');
-const previewImg = document.getElementById('previewImage');
 const imageUpload = document.getElementById('imageUpload');
 
 // Helper function to draw a drag handle
@@ -112,22 +107,17 @@ function isNearPosition(mousePos, textPos) {
 // Add event listeners
 topTextInput.addEventListener('input', () => {
     drawImage(true);
-    updatePreview(true);
 });
 bottomTextInput.addEventListener('input', () => {
     drawImage(true);
-    updatePreview(true);
 });
 fontSizeInput.addEventListener('input', () => {
     drawImage(true);
-    updatePreview(true);
 });
 textColorInput.addEventListener('input', () => {
     drawImage(true);
-    updatePreview(true);
 });
 downloadBtn.addEventListener('click', downloadImage);
-previewBtn.addEventListener('click', () => updatePreview(true));
 
 // Add drag event listeners
 canvas.addEventListener('mousedown', (e) => {
@@ -151,7 +141,6 @@ canvas.addEventListener('mousemove', (e) => {
             bottomTextPosition = ratio;
         }
         drawImage(true);
-        updatePreview(true);
     }
 });
 
@@ -159,7 +148,6 @@ canvas.addEventListener('mouseup', () => {
     isDragging = false;
     dragTarget = null;
     drawImage(true);
-    updatePreview(true);
 });
 
 canvas.addEventListener('touchstart', (e) => {
@@ -185,7 +173,6 @@ canvas.addEventListener('touchmove', (e) => {
             bottomTextPosition = ratio;
         }
         drawImage(true);
-        updatePreview(true);
         e.preventDefault();
     }
 });
@@ -194,7 +181,6 @@ canvas.addEventListener('touchend', () => {
     isDragging = false;
     dragTarget = null;
     drawImage(true);
-    updatePreview(true);
 });
 
 canvas.addEventListener('touchcancel', () => {
@@ -207,7 +193,6 @@ window.addEventListener('mouseup', () => {
         isDragging = false;
         dragTarget = null;
         drawImage(true);
-        updatePreview(true);
     }
 });
 
@@ -216,7 +201,6 @@ window.addEventListener('touchend', () => {
         isDragging = false;
         dragTarget = null;
         drawImage(true);
-        updatePreview(true);
     }
 });
 
@@ -290,25 +274,6 @@ function drawImage(addText = true) {
         if (!isDragging) {
             drawDragHandle(topPos.x, topPos.y, 'Top text - Drag to move');
             drawDragHandle(bottomPos.x, bottomPos.y, 'Bottom text - Drag to move');
-        }
-    }
-}
-
-// Update the preview image with or without text
-function updatePreview(withText = false) {
-    // Update live preview image (if available). Use try/catch because canvas may be tainted
-    if (previewImg) {
-        try {
-            const isDraggingTemp = isDragging;
-            isDragging = true; // Temporarily hide drag handles
-            drawImage(withText);  // Draw with or without text
-            previewImg.src = canvas.toDataURL('image/png');
-            isDragging = isDraggingTemp; // Restore drag state
-            drawImage(withText); // Redraw canvas with handles if needed
-        } catch (e) {
-            // If canvas is tainted (cross-origin), toDataURL will throw. We silently fail and leave preview empty.
-            console.warn('Could not update preview image (canvas may be tainted):', e);
-            previewImg.src = '';
         }
     }
 }
