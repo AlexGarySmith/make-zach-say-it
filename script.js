@@ -41,10 +41,18 @@ function getRandomZimagePath() {
     return `${RAW_BASE_URL}${ZIMAGE_LIST[index]}`;
 }
 
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
 function buildZimageGallery(imageUrls) {
     const gallery = document.getElementById('zimagesGallery');
     if (!gallery) return;
 
+    shuffleArray(imageUrls);
     gallery.innerHTML = '';
     imageUrls.forEach((url) => {
         const card = document.createElement('div');
@@ -63,6 +71,12 @@ function buildZimageGallery(imageUrls) {
 function scrollCarousel(direction = 1) {
     const track = document.querySelector('.zimage-carousel-track');
     if (!track) return;
+
+    if (direction < 0 && track.scrollLeft <= 1) {
+        const maxScroll = track.scrollWidth - track.clientWidth;
+        track.scrollTo({ left: maxScroll, behavior: 'smooth' });
+        return;
+    }
 
     const card = track.querySelector('.zimage-card');
     const gap = 12;
