@@ -53,6 +53,29 @@ canvas {
     align-self: center;
 }
 
+.make-zach-preview-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 420px;
+    padding: 20px 0;
+}
+
+.make-zach-preview-section .container {
+    width: 100%;
+}
+
+.make-zach-preview-section .editor {
+    width: 100%;
+    padding: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+.make-zach-preview-section .controls {
+    display: none;
+}
+
 .controls {
     width: 300px;
     padding: 20px;
