@@ -128,13 +128,16 @@ input[type="color"] {
 }
 
 .zimage-carousel {
-    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-top: 16px;
 }
 
 .zimage-carousel-track-wrapper {
+    flex: 1;
     overflow: hidden;
-    padding: 0 58px;
+    min-height: 220px;
 }
 
 .zimage-carousel-track {
@@ -142,7 +145,7 @@ input[type="color"] {
     gap: 12px;
     overflow-x: auto;
     scroll-behavior: smooth;
-    padding-bottom: 4px;
+    padding: 8px 0;
 }
 
 .zimage-carousel-track::-webkit-scrollbar {
@@ -156,7 +159,7 @@ input[type="color"] {
 
 .zimage-card {
     cursor: pointer;
-    flex: 0 0 clamp(180px, 22vw, 240px);
+    flex: 0 0 min(calc((100% - 12px) / 2), 240px);
     overflow: hidden;
     border: 1px solid #ddd;
     border-radius: 12px;
@@ -177,9 +180,6 @@ input[type="color"] {
 }
 
 .carousel-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
     width: 44px;
     height: 44px;
     display: inline-flex;
@@ -187,26 +187,17 @@ input[type="color"] {
     justify-content: center;
     border: 1px solid rgba(150, 150, 150, 0.7);
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.88);
     color: #333;
     font-size: 1.1rem;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
-    z-index: 2;
-}
-
-.carousel-arrow.prev {
-    left: 8px;
-}
-
-.carousel-arrow.next {
-    right: 8px;
 }
 
 .carousel-arrow:hover {
-    background-color: rgba(240, 240, 240, 0.9);
+    background-color: rgba(240, 240, 240, 0.95);
     border-color: rgba(120, 120, 120, 0.85);
-    transform: translateY(-50%) scale(1.03);
+    transform: scale(1.03);
 }
 
 button {
