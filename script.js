@@ -6,6 +6,7 @@ let canvasAspectRatio = 4 / 3;
 const BASE_FONT_SIZE = 40;
 const HANDLE_RADIUS = 8;
 const HANDLE_PADDING = 12;
+const HANDLE_HOVER_MARGIN = 24;
 const MIN_WIDTH_RATIO = 0.25;
 const MAX_WIDTH_RATIO = 0.95;
 
@@ -119,15 +120,15 @@ function getTextHandlePositions(settings, dims) {
     };
 }
 
-function pointInTextBox(point, text, settings) {
+function pointInTextBox(point, text, settings, extraMargin = 0) {
     const center = ratioToPixels(settings);
     const local = rotatePoint(point, center, -settings.angle);
     const dims = getTextBoxData(text, settings);
     return (
-        local.x >= -dims.halfWidth &&
-        local.x <= dims.halfWidth &&
-        local.y >= -dims.halfHeight &&
-        local.y <= dims.halfHeight
+        local.x >= -dims.halfWidth - extraMargin &&
+        local.x <= dims.halfWidth + extraMargin &&
+        local.y >= -dims.halfHeight - extraMargin &&
+        local.y <= dims.halfHeight + extraMargin
     );
 }
 
@@ -140,8 +141,8 @@ function updateHoverTarget(mousePos) {
     const bottomText = bottomTextInput.value.toUpperCase();
     const topBox = textBoxes.top;
     const bottomBox = textBoxes.bottom;
-    const topHit = topText && pointInTextBox(mousePos, topText, topBox);
-    const bottomHit = bottomText && pointInTextBox(mousePos, bottomText, bottomBox);
+    const topHit = topText && pointInTextBox(mousePos, topText, topBox, HANDLE_HOVER_MARGIN);
+    const bottomHit = bottomText && pointInTextBox(mousePos, bottomText, bottomBox, HANDLE_HOVER_MARGIN);
 
     let topHandleHover = false;
     let bottomHandleHover = false;
