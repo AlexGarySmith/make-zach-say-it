@@ -143,9 +143,26 @@ function updateHoverTarget(mousePos) {
     const topHit = topText && pointInTextBox(mousePos, topText, topBox);
     const bottomHit = bottomText && pointInTextBox(mousePos, bottomText, bottomBox);
 
-    if (topHit) {
+    let topHandleHover = false;
+    let bottomHandleHover = false;
+
+    if (topText) {
+        const topDims = getTextBoxData(topText, topBox);
+        const topHandles = getTextHandlePositions(topBox, topDims);
+        topHandleHover = getDistance(mousePos, topHandles.rotate) < HANDLE_RADIUS * 1.5 ||
+            getDistance(mousePos, topHandles.resize) < HANDLE_RADIUS * 1.5;
+    }
+
+    if (bottomText) {
+        const bottomDims = getTextBoxData(bottomText, bottomBox);
+        const bottomHandles = getTextHandlePositions(bottomBox, bottomDims);
+        bottomHandleHover = getDistance(mousePos, bottomHandles.rotate) < HANDLE_RADIUS * 1.5 ||
+            getDistance(mousePos, bottomHandles.resize) < HANDLE_RADIUS * 1.5;
+    }
+
+    if (topHit || topHandleHover) {
         hoveredTextTarget = 'top';
-    } else if (bottomHit) {
+    } else if (bottomHit || bottomHandleHover) {
         hoveredTextTarget = 'bottom';
     } else {
         hoveredTextTarget = null;
