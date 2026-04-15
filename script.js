@@ -29,6 +29,7 @@ let downloadBtn;
 let imageUpload;
 
 const RAW_BASE_URL = 'https://alexgarysmith.github.io/make-zach-say-it/zimages/';
+const ZIMAGE_API_URL = 'https://api.github.com/repos/alexgarysmith/make-zach-say-it/contents/zimages';
 const ZIMAGE_LIST = [
     '0c1c1205-bef4-41d5-bcae-df5a873e9a6d.jpg',
     '1f49a476-d6f4-4018-b2dd-8359925c36d1.jpg',
@@ -59,6 +60,73 @@ const FALLBACK_IMAGE_URL = 'https://alexgarysmith.github.io/make-zach-say-it/zac
 function getRandomZimagePath() {
     const index = Math.floor(Math.random() * ZIMAGE_LIST.length);
     return `${RAW_BASE_URL}${ZIMAGE_LIST[index]}`;
+}
+
+function buildZimageGallery(imageUrls) {
+    const gallery = document.getElementById('zimagesGallery');
+    if (!gallery) return;
+
+    gallery.innerHTML = '';
+    imageUrls.forEach((url, index) => {
+        const card = document.createElement('div');
+        card.className = 'zimage-card';
+        card.setAttribute('data-zimage-src', url);
+
+        const image = document.createElement('img');
+        image.src = url;
+        image.alt = `Zach image ${index + 1}`;
+
+        const label = document.createElement('span');
+        label.textContent = `Zach image ${index + 1}`;
+
+        card.appendChild(image);
+        card.appendChild(label);
+        gallery.appendChild(card);
+    });
+}
+
+function updateGallerySelection(selectedUrl) {
+    const gallery = document.getElementById('zimagesGallery');
+    if (!gallery) return;
+
+    gallery.querySelectorAll('.zimage-card.selected').forEach((card) => {
+        card.classList.remove('selected');
+    });
+
+    const matchingCard = gallery.querySelector(`.zimage-card[data-zimage-src="${selectedUrl}"]`);
+    if (matchingCard) {
+        matchingCard.classList.add('selected');
+    }
+}
+
+function loadZimageGallery() {
+    const gallery = document.getElementById('zimagesGallery');
+    if (!gallery) return;
+
+    fetch(ZIMAGE_API_URL)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('GitHub API response not ok');
+            }
+            return response.json();
+        })
+        .then((files) => {
+            const imageUrls = files
+                .filter((file) => file.type === 'file' && /\.(jpe?g|png|gif)$/i.test(file.name))
+                .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+                .map((file) => `${RAW_BASE_URL}${file.name}`);
+
+            if (imageUrls.length === 0) {
+                throw new Error('No image files found');
+            }
+            buildZimageGallery(imageUrls);
+            updateGallerySelection(baseImage.src);
+        })
+        .catch(() => {
+            const imageUrls = ZIMAGE_LIST.map((name) => `${RAW_BASE_URL}${name}`);
+            buildZimageGallery(imageUrls);
+            updateGallerySelection(baseImage.src);
+        });
 }
 
 function updateCanvasSize() {
@@ -236,7 +304,7 @@ function setBaseImageFromSrc(src, external = false, onErrorFallback) {
         baseImage = img;
         canvasAspectRatio = img.height / img.width || canvasAspectRatio;
         updateCanvasSize();
-        drawImage(false);  // Don't add text when just loading image
+        drawImage(true);
     };
     img.onerror = function(e) {
         if (typeof onErrorFallback === 'function') {
@@ -277,6 +345,8 @@ function initializeApp() {
         console.warn('Random zimages load failed, falling back to remote default image');
         setBaseImageFromSrc(FALLBACK_IMAGE_URL, true);
     });
+
+    loadZimageGallery();
 
     if (topTextInput) topTextInput.addEventListener('input', () => drawImage(true));
     if (bottomTextInput) bottomTextInput.addEventListener('input', () => drawImage(true));
@@ -510,6 +580,24 @@ function initializeApp() {
         });
     }
 
+    document.addEventListener('click', (e) => {
+        const trigger = e.target.closest('[data-zimage-src]');
+        if (!trigger) return;
+
+        const src = trigger.getAttribute('data-zimage-src');
+        if (!src) return;
+
+        setBaseImageFromSrc(src, true);
+
+        const selectedCards = document.querySelectorAll('.zimage-card.selected');
+        selectedCards.forEach((card) => card.classList.remove('selected'));
+        if (trigger.classList.contains('zimage-card')) {
+            trigger.classList.add('selected');
+        }
+
+        e.preventDefault();
+    });
+
     window.addEventListener('resize', updateCanvasSize);
     window.addEventListener('orientationchange', updateCanvasSize);
     window.addEventListener('scroll', scheduleRedraw, { passive: true });
@@ -611,7 +699,7 @@ function downloadImage() {
     try {
         drawImage(true, false);  // Always include text in downloads, but hide UI handles
         const link = document.createElement('a');
-        link.download = 'meme.png';
+        link.download = 'zach-meme-aka-zeme.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
     } catch (e) {

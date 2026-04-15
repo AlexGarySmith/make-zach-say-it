@@ -127,6 +127,42 @@ input[type="color"] {
     padding: 0;
 }
 
+.zimage-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.zimage-card {
+    cursor: pointer;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    transition: border-color 0.2s, transform 0.2s;
+}
+
+.zimage-card:hover,
+.zimage-card.selected {
+    border-color: #007bff;
+    transform: translateY(-2px);
+}
+
+.zimage-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.zimage-card span {
+    display: block;
+    padding: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+    color: #333;
+}
+
 button {
     width: 100%;
     padding: 10px;
