@@ -23,7 +23,8 @@ let canvasContainer;
 
 let topTextInput;
 let bottomTextInput;
-let textColorInput;
+let topTextColorInput;
+let bottomTextColorInput;
 let downloadBtn;
 let imageUpload;
 
@@ -265,7 +266,8 @@ function initializeApp() {
     canvasContainer = document.querySelector('.canvas-container');
     topTextInput = document.getElementById('topText');
     bottomTextInput = document.getElementById('bottomText');
-    textColorInput = document.getElementById('textColor');
+    topTextColorInput = document.getElementById('topTextColor');
+    bottomTextColorInput = document.getElementById('bottomTextColor');
     downloadBtn = document.getElementById('downloadBtn');
     imageUpload = document.getElementById('imageUpload');
 
@@ -278,7 +280,8 @@ function initializeApp() {
 
     if (topTextInput) topTextInput.addEventListener('input', () => drawImage(true));
     if (bottomTextInput) bottomTextInput.addEventListener('input', () => drawImage(true));
-    if (textColorInput) textColorInput.addEventListener('input', () => drawImage(true));
+    if (topTextColorInput) topTextColorInput.addEventListener('input', () => drawImage(true));
+    if (bottomTextColorInput) bottomTextColorInput.addEventListener('input', () => drawImage(true));
     if (downloadBtn) downloadBtn.addEventListener('click', downloadImage);
 
     if (canvas) {
@@ -569,7 +572,7 @@ function drawTextBox(key, text, settings, showHandles) {
     }
 
     ctx.font = `${dims.fontSize}px Impact`;
-    ctx.fillStyle = textColorInput.value;
+    ctx.fillStyle = key === 'top' ? (topTextColorInput ? topTextColorInput.value : '#ffffff') : (bottomTextColorInput ? bottomTextColorInput.value : '#ffffff');
     ctx.strokeStyle = 'black';
     ctx.lineWidth = 3;
     ctx.strokeText(text, 0, 0);
