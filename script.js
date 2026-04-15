@@ -8,6 +8,7 @@ let topTextPosition = { x: 0.5, y: 0.12 };
 let bottomTextPosition = { x: 0.5, y: 0.88 };
 let isDragging = false;
 let dragTarget = null;
+let hoveredTextTarget = null;
 let canvasContainer;
 
 let topTextInput;
@@ -61,6 +62,16 @@ function updateCanvasSize() {
 
     if (resized) {
         drawImage(true);
+    }
+}
+
+function updateHoverTarget(mousePos) {
+    if (isNearPosition(mousePos, ratioToPixels(topTextPosition))) {
+        hoveredTextTarget = 'top';
+    } else if (isNearPosition(mousePos, ratioToPixels(bottomTextPosition))) {
+        hoveredTextTarget = 'bottom';
+    } else {
+        hoveredTextTarget = null;
     }
 }
 
@@ -135,8 +146,8 @@ function initializeApp() {
         });
 
         canvas.addEventListener('mousemove', (e) => {
+            const pos = getMousePos(e);
             if (isDragging) {
-                const pos = getMousePos(e);
                 const ratio = pixelsToRatio(pos);
                 if (dragTarget === 'top') {
                     topTextPosition = ratio;
@@ -144,7 +155,15 @@ function initializeApp() {
                     bottomTextPosition = ratio;
                 }
                 drawImage(true);
+            } else {
+                updateHoverTarget(pos);
+                drawImage(true);
             }
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            hoveredTextTarget = null;
+            if (!isDragging) drawImage(true);
         });
 
         canvas.addEventListener('mouseup', () => {
@@ -276,7 +295,7 @@ function isNearPosition(mousePos, textPos) {
 }
 
 // Draw the image and optionally add text
-function drawImage(addText = true) {
+function drawImage(addText = true, showHandles = true) {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -316,17 +335,20 @@ function drawImage(addText = true) {
         ctx.strokeText(bottomText, bottomPos.x, bottomPos.y);
         ctx.fillText(bottomText, bottomPos.x, bottomPos.y);
 
-        // Draw drag handles if not dragging
-        if (!isDragging) {
-            drawDragHandle(topPos.x, topPos.y, 'Top text - Drag to move');
-            drawDragHandle(bottomPos.x, bottomPos.y, 'Bottom text - Drag to move');
+        // Draw drag handle only when hovering and not dragging
+        if (showHandles && !isDragging && hoveredTextTarget) {
+            if (hoveredTextTarget === 'top') {
+                drawDragHandle(topPos.x, topPos.y, 'Top text - Drag to move');
+            } else if (hoveredTextTarget === 'bottom') {
+                drawDragHandle(bottomPos.x, bottomPos.y, 'Bottom text - Drag to move');
+            }
         }
     }
 }
 
 function downloadImage() {
     try {
-        drawImage(true);  // Always include text in downloads
+        drawImage(true, false);  // Always include text, but never show UI handles in downloads
         const link = document.createElement('a');
         link.download = 'meme.png';
         link.href = canvas.toDataURL('image/png');
