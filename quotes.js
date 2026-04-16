@@ -1,13 +1,13 @@
 const QUOTE_CONFIG = {
     googleFormUrl: 'https://forms.gle/sexDAmnKmpu2H5LX7',
     resultsUrl: 'https://docs.google.com/spreadsheets/d/17omExHYxgq5jPH2pxEiHXjvMB_shcW6TqDfwBmQRfGA/edit?usp=sharing',
-    sheetCsvUrl: 'https://docs.google.com/spreadsheets/d/17omExHYxgq5jPH2pxEiHXjvMB_shcW6TqDfwBmQRfGA/export?format=csv&gid=0'
+    sheetCsvUrl: 'https://docs.google.com/spreadsheets/d/17omExHYxgq5jPH2pxEiHXjvMB_shcW6TqDfwBmQRfGA/gviz/tq?tqx=out:csv&gid=0'
 };
 
 const FALLBACK_QUOTES = [
     {
-        quote: 'Add your first Zach quote through the Google Form and it will appear here.',
-        context: 'This placeholder stays visible until the live Google Sheet is connected.'
+        quote: 'The Zachronomicon says there are no Zach-isms.',
+        context: 'That cant be right.'
     }
 ];
 
@@ -103,7 +103,7 @@ function updateQuoteDisplay(entry) {
     if (quoteContext) {
         if (entry.context) {
             quoteContext.hidden = false;
-            quoteContext.textContent = `Context: ${entry.context}`;
+            quoteContext.textContent = `${entry.context}`;
         } else {
             quoteContext.hidden = true;
             quoteContext.textContent = '';
@@ -193,13 +193,13 @@ async function loadQuotesFromGoogleSheet() {
 
         allQuotes = shuffleArray(normalizedQuotes);
         if (status) {
-            status.textContent = `Loaded ${allQuotes.length} Zach quotes from the Google Form responses.`;
+            status.textContent = `There are currently ${allQuotes.length} Zach-isms in the Zachronomicon.`;
         }
     } catch (error) {
-        console.warn('Could not load live quotes:', error);
+        console.warn('Could not load Zach-isms', error);
         allQuotes = [...FALLBACK_QUOTES];
         if (status) {
-            status.textContent = 'Could not load the live Google Sheet yet, so placeholder content is being shown.';
+            status.textContent = 'Could not load the Zachronomicon, so placeholder content is being shown.';
         }
     }
 }
