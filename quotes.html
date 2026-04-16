@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zach Quotes</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="quote-page-body">
+    <div class="container quote-page-container">
+        <section class="quote-shell">
+            <h1>Zach Quote Generator</h1>
+            <p class="quote-subtitle">A random Zach quote, plus the context when it exists.</p>
+
+            <div class="quote-card">
+                <div class="quote-mark">“</div>
+                <p id="quoteText" class="quote-text">Loading a quote...</p>
+                <p id="quoteContext" class="quote-context" hidden></p>
+                <p id="quoteMeta" class="quote-meta" hidden></p>
+            </div>
+
+            <div class="quote-actions">
+                <button id="newQuoteBtn" type="button">Show another quote</button>
+                <a id="submitQuoteLink" class="secondary-action" href="#" target="_blank" rel="noopener noreferrer">Submit a quote</a>
+                <a id="viewResultsLink" class="secondary-action" href="#" target="_blank" rel="noopener noreferrer">View quote sheet</a>
+            </div>
+
+            <p id="quoteStatus" class="quote-status">Connect your Google Form and response sheet URLs to load live quotes.</p>
+        </section>
+
+        <section id="quoteFormSection" class="quote-form-section" hidden>
+            <h2>Submit your own Zach quote</h2>
+            <iframe id="quoteFormFrame" title="Submit a Zach quote"></iframe>
+        </section>
+    </div>
+
+    <script src="quotes.js"></script>
+</body>
+</html>
