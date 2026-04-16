@@ -140,13 +140,7 @@ function updateQuoteLinks() {
     const resultsUrl = isConfiguredUrl(QUOTE_CONFIG.resultsUrl) ? QUOTE_CONFIG.resultsUrl : '';
 
     if (submitLink) {
-        if (formUrl) {
-            submitLink.href = formUrl;
-            submitLink.classList.remove('is-disabled');
-        } else {
-            submitLink.removeAttribute('href');
-            submitLink.classList.add('is-disabled');
-        }
+        submitLink.remove();
     }
 
     if (resultsLink) {
