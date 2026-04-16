@@ -72,15 +72,28 @@ function scrollCarousel(direction = 1) {
     const track = document.querySelector('.zimage-carousel-track');
     if (!track) return;
 
+    const card = track.querySelector('.zimage-card');
+    const gap = 12;
+    const scrollAmount = (card ? card.offsetWidth : 220) + gap;
+    const maxScroll = track.scrollWidth - track.clientWidth;
+
     if (direction < 0 && track.scrollLeft <= 1) {
-        const maxScroll = track.scrollWidth - track.clientWidth;
         track.scrollTo({ left: maxScroll, behavior: 'smooth' });
         return;
     }
 
-    const card = track.querySelector('.zimage-card');
-    const gap = 12;
-    const scrollAmount = (card ? card.offsetWidth : 220) + gap;
+    if (direction > 0 && track.scrollLeft + track.clientWidth >= maxScroll - 1) {
+        track.scrollTo({ left: 0, behavior: 'smooth' });
+        return;
+    }
+
+    const nextPosition = track.scrollLeft + direction * scrollAmount;
+
+    if (direction > 0 && nextPosition >= maxScroll - 1) {
+        track.scrollTo({ left: 0, behavior: 'smooth' });
+        return;
+    }
+
     track.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
 }
 
