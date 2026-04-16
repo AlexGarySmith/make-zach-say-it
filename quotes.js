@@ -78,8 +78,8 @@ function parseCsv(text) {
 }
 
 function normalizeQuoteRow(row) {
-    const quote = row.quote || row.Quote || row['Zach Quote'] || row['Quote'];
-    const context = row.context || row.Context || row['Quote Context'] || row['Context'] || '';
+    const quote = row.quote || row.Quote || row['Zach Quote'] || row['Quote'] || row['What did he say this time?'];
+    const context = row.context || row.Context || row['Quote Context'] || row['Context'] || row['Any context?'] || '';
     const date = row.date || row.Date || row.timestamp || row.Timestamp || '';
 
     if (!quote) return null;
