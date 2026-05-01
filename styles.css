@@ -134,6 +134,13 @@ input[type="color"] {
     margin-top: 16px;
 }
 
+.carousel-title {
+    margin-top: 28px;
+    margin-bottom: 4px;
+    color: #444;
+    font-size: 1rem;
+}
+
 .zimage-carousel-track-wrapper {
     flex: 1;
     overflow: hidden;

@@ -30,6 +30,8 @@ let imageUpload;
 
 const RAW_BASE_URL = 'https://alexgarysmith.github.io/make-zach-say-it/zimages/';
 const ZIMAGE_API_URL = 'https://api.github.com/repos/alexgarysmith/make-zach-say-it/contents/zimages';
+const ZEME_BASE_URL = 'https://alexgarysmith.github.io/make-zach-say-it/zemes/';
+const ZEME_API_URL = 'https://api.github.com/repos/alexgarysmith/make-zach-say-it/contents/zemes';
 const ZIMAGE_LIST = [];
 const FALLBACK_IMAGE_URL = `${RAW_BASE_URL}2deaf793-8355-40b4-a8dc-039b823ccd9c.jpg`;
 
@@ -68,8 +70,27 @@ function buildZimageGallery(imageUrls) {
     });
 }
 
-function scrollCarousel(direction = 1) {
-    const track = document.querySelector('.zimage-carousel-track');
+function buildZemeGallery(imageUrls) {
+    const gallery = document.getElementById('zemesGallery');
+    if (!gallery) return;
+
+    shuffleArray(imageUrls);
+    gallery.innerHTML = '';
+    imageUrls.forEach((url) => {
+        const card = document.createElement('div');
+        card.className = 'zimage-card';
+        card.setAttribute('data-zeme-src', url);
+
+        const image = document.createElement('img');
+        image.src = url;
+        image.alt = 'Favorite zeme';
+
+        card.appendChild(image);
+        gallery.appendChild(card);
+    });
+}
+
+function scrollCarousel(track, direction = 1) {
     if (!track) return;
 
     const card = track.querySelector('.zimage-card');
@@ -138,6 +159,33 @@ function loadZimageGallery() {
             const imageUrls = ZIMAGE_LIST.length ? ZIMAGE_LIST.map((name) => `${RAW_BASE_URL}${name}`) : [FALLBACK_IMAGE_URL];
             buildZimageGallery(imageUrls);
             updateGallerySelection(baseImage.src);
+        });
+}
+
+function loadZemeGallery() {
+    const gallery = document.getElementById('zemesGallery');
+    if (!gallery) return;
+
+    fetch(ZEME_API_URL)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('GitHub API response not ok');
+            }
+            return response.json();
+        })
+        .then((files) => {
+            const imageUrls = files
+                .filter((file) => file.type === 'file' && /\.(jpe?g|png|gif)$/i.test(file.name))
+                .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+                .map((file) => `${ZEME_BASE_URL}${file.name}`);
+
+            if (imageUrls.length === 0) {
+                throw new Error('No image files found');
+            }
+            buildZemeGallery(imageUrls);
+        })
+        .catch(() => {
+            gallery.innerHTML = '';
         });
 }
 
@@ -359,6 +407,7 @@ function initializeApp() {
     });
 
     loadZimageGallery();
+    loadZemeGallery();
 
     if (topTextInput) topTextInput.addEventListener('input', () => drawImage(true));
     if (bottomTextInput) bottomTextInput.addEventListener('input', () => drawImage(true));
@@ -366,10 +415,13 @@ function initializeApp() {
     if (bottomTextColorInput) bottomTextColorInput.addEventListener('input', () => drawImage(true));
     if (downloadBtn) downloadBtn.addEventListener('click', downloadImage);
 
-    const carouselPrev = document.querySelector('.carousel-arrow.prev');
-    const carouselNext = document.querySelector('.carousel-arrow.next');
-    if (carouselPrev) carouselPrev.addEventListener('click', () => scrollCarousel(-1));
-    if (carouselNext) carouselNext.addEventListener('click', () => scrollCarousel(1));
+    document.querySelectorAll('.zimage-carousel').forEach((carousel) => {
+        const track = carousel.querySelector('.zimage-carousel-track');
+        const carouselPrev = carousel.querySelector('.carousel-arrow.prev');
+        const carouselNext = carousel.querySelector('.carousel-arrow.next');
+        if (carouselPrev) carouselPrev.addEventListener('click', () => scrollCarousel(track, -1));
+        if (carouselNext) carouselNext.addEventListener('click', () => scrollCarousel(track, 1));
+    });
 
     if (canvas) {
         canvas.addEventListener('mousedown', (e) => {
