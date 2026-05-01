@@ -162,6 +162,36 @@ function loadZimageGallery() {
         });
 }
 
+function loadRandomZimage() {
+    fetch(ZIMAGE_API_URL)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('GitHub API response not ok');
+            }
+            return response.json();
+        })
+        .then((files) => {
+            const imageUrls = files
+                .filter((file) => file.type === 'file' && /\.(jpe?g|png|gif)$/i.test(file.name))
+                .map((file) => `${RAW_BASE_URL}${file.name}`);
+
+            if (imageUrls.length === 0) {
+                throw new Error('No image files found');
+            }
+
+            const randomUrl = imageUrls[Math.floor(Math.random() * imageUrls.length)];
+            setBaseImageFromSrc(randomUrl, true, () => {
+                console.warn('Random zimages load failed, falling back to default image');
+                setBaseImageFromSrc(FALLBACK_IMAGE_URL, true);
+            });
+            updateGallerySelection(randomUrl);
+        })
+        .catch(() => {
+            setBaseImageFromSrc(FALLBACK_IMAGE_URL, true);
+            updateGallerySelection(FALLBACK_IMAGE_URL);
+        });
+}
+
 function loadZemeGallery() {
     const gallery = document.getElementById('zemesGallery');
     if (!gallery) return;
@@ -400,11 +430,7 @@ function initializeApp() {
     imageUpload = document.getElementById('imageUpload');
 
     updateCanvasSize();
-    const defaultImagePath = getRandomZimagePath();
-    setBaseImageFromSrc(defaultImagePath, true, () => {
-        console.warn('Random zimages load failed, falling back to remote default image');
-        setBaseImageFromSrc(FALLBACK_IMAGE_URL, true);
-    });
+    loadRandomZimage();
 
     loadZimageGallery();
     loadZemeGallery();
