@@ -1,50 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Text Generator Controls</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <div class="controls">
-            <div class="control-group control-row">
-                <div class="control-item">
-                    <label for="topText">Top Text:</label>
-                    <input type="text" id="topText" placeholder="Enter top text">
-                </div>
-                <div class="control-item color-item">
-                    <label for="topTextColor">Top Color:</label>
-                    <input type="color" id="topTextColor" value="#ffffff">
-                </div>
-            </div>
+<!--
+  Squarespace Code Block: Controls
+  - Paste this into a Code Block on the same page as canvas_SSpace-chunk.html.
+  - Do NOT include a <script> tag here; it lives in canvas_SSpace-chunk.html.
+-->
 
-            <div class="control-group control-row">
-                <div class="control-item">
-                    <label for="bottomText">Bottom Text:</label>
-                    <input type="text" id="bottomText" placeholder="Enter bottom text">
-                </div>
-                <div class="control-item color-item">
-                    <label for="bottomTextColor">Bottom Color:</label>
-                    <input type="color" id="bottomTextColor" value="#ffffff">
-                </div>
-            </div>
-
-            <div class="control-group">
-                <p class="hint">On mobile you can tap, drag, and pinch to move text.  Otherwise use the side handle to resize and the top handle to rotate.</p>
-            </div>
-
-            <div class="control-group">
-                <label for="imageUpload">Upload Image:</label>
-                <input type="file" id="imageUpload" accept="image/*">
-                <small>Or use this random picture of Zach.</small>
-            </div>
-
-            <div class="control-group">
-                <button id="downloadBtn" type="button">Download Image</button>
-            </div>
-        </div>
+<div class="controls">
+  <div class="control-group">
+    <label for="topText">Top Text</label>
+    <div class="control-row">
+      <div class="control-item">
+        <input type="text" id="topText" placeholder="Top text…" autocomplete="off" />
+      </div>
+      <div class="color-item">
+        <label for="topTextColor">Color</label>
+        <input type="color" id="topTextColor" value="#ffffff" />
+      </div>
     </div>
-</body>
-</html>
+  </div>
+
+  <div class="control-group">
+    <label for="bottomText">Bottom Text</label>
+    <div class="control-row">
+      <div class="control-item">
+        <input type="text" id="bottomText" placeholder="Bottom text…" autocomplete="off" />
+      </div>
+      <div class="color-item">
+        <label for="bottomTextColor">Color</label>
+        <input type="color" id="bottomTextColor" value="#ffffff" />
+      </div>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <p class="hint">On mobile you can tap, drag, and pinch to move text. Otherwise use the side handle to resize and the top handle to rotate.</p>
+  </div>
+
+  <div class="control-group">
+    <label for="imageUpload">Upload Your Own Image</label>
+    <input type="file" id="imageUpload" accept="image/*" />
+    <small>Or use a random picture of Zach.</small>
+  </div>
+
+  <div class="control-group">
+    <button id="downloadBtn" type="button">Download Zeme</button>
+  </div>
+</div>

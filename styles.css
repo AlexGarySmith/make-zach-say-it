@@ -33,8 +33,6 @@ h1 {
 }
 
 .canvas-container {
-    flex: 1;
-    min-width: 0;
     width: 100%;
     background-color: #ddd;
     border-radius: 4px;
@@ -42,6 +40,11 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.editor .canvas-container {
+    flex: 1;
+    min-width: 0;
 }
 
 canvas {
@@ -77,10 +80,14 @@ canvas {
 }
 
 .controls {
-    width: 300px;
+    width: 100%;
     padding: 20px;
     background-color: #f8f8f8;
     border-radius: 4px;
+}
+
+.editor .controls {
+    width: 300px;
 }
 
 .control-group {
@@ -371,13 +378,12 @@ canvas {
         padding: 16px;
     }
 
-    .canvas-container,
-    .controls {
-        width: 100%;
+    .editor .canvas-container {
+        order: -1;
     }
 
-    .canvas-container {
-        order: -1;
+    .editor .controls {
+        width: 100%;
     }
 
     .controls {
