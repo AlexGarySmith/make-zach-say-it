@@ -1,0 +1,41 @@
+<!--
+  Squarespace Code Block: Quotes
+  - Paste this into a Code Block on your Zach-isms page.
+  - The CSS must be in Settings > Advanced > Code Injection > Header:
+      <link rel="stylesheet" href="https://alexgarysmith.github.io/make-zach-say-it/styles.css" />
+  - The <script> tag at the bottom must appear exactly once on the page.
+  - Optional: to get the grey gradient background, add this to the
+    page-specific Code Injection > Header in Squarespace:
+      <style>body { background: linear-gradient(180deg, #f6f6f6 0%, #ececec 100%); }</style>
+-->
+
+<div class="container quote-page-container">
+  <section class="quote-shell">
+    <h1>A Zach-ism for you:</h1>
+
+    <div class="quote-card">
+      <div class="quote-mark">"</div>
+      <p id="quoteText" class="quote-text">Loading a quote...</p>
+      <p id="quoteContext" class="quote-context" hidden></p>
+      <p id="quoteMeta" class="quote-meta" hidden></p>
+    </div>
+
+    <div class="quote-actions">
+      <button id="newQuoteBtn" type="button">Show another Zach-ism</button>
+      <button id="submitQuoteBtn" type="button" class="secondary-action">Submit a Zach-ism</button>
+      <a id="viewResultsLink" class="secondary-action" href="#" target="_blank" rel="noopener noreferrer">View Unabridge Zachronomicon</a>
+    </div>
+
+    <p id="quoteStatus" class="quote-status">There was an error loading the Zachronomicon. Contact the webmaster via mailer daemon.</p>
+  </section>
+
+  <section id="quoteFormSection" class="quote-form-section" hidden>
+    <div class="quote-form-header">
+      <h2>Submit your own Zach-ism</h2>
+      <button id="closeFormBtn" type="button" class="quote-form-close" aria-label="Close">✕</button>
+    </div>
+    <iframe id="quoteFormFrame" title="Submit a Zach-ism"></iframe>
+  </section>
+</div>
+
+<script src="https://alexgarysmith.github.io/make-zach-say-it/quotes.js"></script>
