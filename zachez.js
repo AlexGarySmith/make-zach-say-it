@@ -94,29 +94,30 @@ function buildZemeGallery(imageUrls) {
 function scrollCarousel(track, direction = 1) {
     if (!track) return;
 
-    const card = track.querySelector('.zimage-card');
-    const gap = 12;
-    const scrollAmount = (card ? card.offsetWidth : 220) + gap;
-    const maxScroll = track.scrollWidth - track.clientWidth;
+    const cards = Array.from(track.querySelectorAll('.zimage-card'));
+    if (!cards.length) return;
 
-    if (direction < 0 && track.scrollLeft <= 1) {
-        track.scrollTo({ left: maxScroll, behavior: 'smooth' });
-        return;
-    }
+    const trackWidth = track.clientWidth;
+    const trackCenter = track.scrollLeft + trackWidth / 2;
+    const maxScroll = track.scrollWidth - trackWidth;
 
-    if (direction > 0 && track.scrollLeft + track.clientWidth >= maxScroll - 1) {
-        track.scrollTo({ left: 0, behavior: 'smooth' });
-        return;
-    }
+    // Find the card whose center is closest to the track's visible center
+    let centeredIndex = 0;
+    let minDistance = Infinity;
+    cards.forEach((card, i) => {
+        const dist = Math.abs((card.offsetLeft + card.offsetWidth / 2) - trackCenter);
+        if (dist < minDistance) {
+            minDistance = dist;
+            centeredIndex = i;
+        }
+    });
 
-    const nextPosition = track.scrollLeft + direction * scrollAmount;
+    // Step one card in the given direction, wrapping around
+    const targetIndex = (centeredIndex + direction + cards.length) % cards.length;
+    const targetCard = cards[targetIndex];
+    const scrollTarget = targetCard.offsetLeft + targetCard.offsetWidth / 2 - trackWidth / 2;
 
-    if (direction > 0 && nextPosition >= maxScroll - 1) {
-        track.scrollTo({ left: 0, behavior: 'smooth' });
-        return;
-    }
-
-    track.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+    track.scrollTo({ left: Math.max(0, Math.min(maxScroll, scrollTarget)), behavior: 'smooth' });
 }
 
 function updateGallerySelection(selectedUrl) {
