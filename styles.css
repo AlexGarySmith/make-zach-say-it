@@ -282,6 +282,35 @@ canvas {
     margin-top: 20px;
 }
 
+.quote-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.quote-form-header h2 {
+    margin: 0;
+}
+
+.quote-form-close {
+    display: none;
+    width: auto;
+    padding: 6px 14px;
+    background: #e8e8e8;
+    color: #333;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.quote-form-close:hover {
+    background: #dcdcdc;
+}
+
+#submitQuoteBtn {
+    display: none;
+}
+
 .quote-subtitle {
     text-align: center;
     color: #666;
@@ -423,5 +452,43 @@ canvas {
     button {
         padding: 12px;
         font-size: 1rem;
+    }
+
+    .zimage-card {
+        max-width: 160px;
+    }
+
+    .zimage-carousel-track-wrapper {
+        min-height: 140px;
+    }
+
+    .zimage-card img {
+        max-height: 140px;
+    }
+
+    #submitQuoteBtn {
+        display: inline-flex;
+    }
+
+    .quote-form-close {
+        display: inline-flex;
+    }
+
+    .quote-form-section.is-open {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .quote-form-section.is-open #quoteFormFrame {
+        flex: 1;
+        min-height: 0;
     }
 }

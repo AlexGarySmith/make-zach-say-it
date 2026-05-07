@@ -20,6 +20,7 @@
 
             <div class="quote-actions">
                 <button id="newQuoteBtn" type="button">Show another Zach-ism</button>
+                <button id="submitQuoteBtn" type="button" class="secondary-action">Submit a Zach-ism</button>
                 <a id="viewResultsLink" class="secondary-action" href="#" target="_blank" rel="noopener noreferrer">View Unabridge Zachronomicon</a>
             </div>
 
@@ -27,7 +28,10 @@
         </section>
 
         <section id="quoteFormSection" class="quote-form-section" hidden>
-            <h2>Submit your own Zach-ism</h2>
+            <div class="quote-form-header">
+                <h2>Submit your own Zach-ism</h2>
+                <button id="closeFormBtn" type="button" class="quote-form-close" aria-label="Close">✕</button>
+            </div>
             <iframe id="quoteFormFrame" title="Submit a Zach-ism"></iframe>
         </section>
     </div>

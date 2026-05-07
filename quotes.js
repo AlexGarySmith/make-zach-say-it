@@ -136,6 +136,8 @@ function updateQuoteLinks() {
     const resultsLink = document.getElementById('viewResultsLink');
     const formSection = document.getElementById('quoteFormSection');
     const formFrame = document.getElementById('quoteFormFrame');
+    const submitBtn = document.getElementById('submitQuoteBtn');
+    const closeBtn = document.getElementById('closeFormBtn');
 
     const formUrl = isConfiguredUrl(QUOTE_CONFIG.googleFormUrl) ? QUOTE_CONFIG.googleFormUrl : '';
     const resultsUrl = isConfiguredUrl(QUOTE_CONFIG.resultsUrl) ? QUOTE_CONFIG.resultsUrl : '';
@@ -157,7 +159,25 @@ function updateQuoteLinks() {
     if (formSection && formFrame && formUrl) {
         const separator = formUrl.includes('?') ? '&' : '?';
         formFrame.src = `${formUrl}${separator}embedded=true`;
-        formSection.hidden = false;
+
+        const isMobile = window.matchMedia('(max-width: 600px)').matches;
+        if (!isMobile) {
+            formSection.hidden = false;
+        }
+
+        if (submitBtn) {
+            submitBtn.addEventListener('click', () => {
+                formSection.hidden = false;
+                formSection.classList.add('is-open');
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                formSection.classList.remove('is-open');
+                formSection.hidden = true;
+            });
+        }
     }
 }
 
