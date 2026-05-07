@@ -135,9 +135,6 @@ input[type="color"] {
 }
 
 .zimage-carousel {
-    display: flex;
-    align-items: center;
-    gap: 8px;
     margin-top: 16px;
 }
 
@@ -149,7 +146,7 @@ input[type="color"] {
 }
 
 .zimage-carousel-track-wrapper {
-    flex: 1;
+    width: 100%;
     overflow: hidden;
     min-height: 220px;
 }
@@ -160,6 +157,7 @@ input[type="color"] {
     overflow-x: auto;
     scroll-behavior: smooth;
     padding: 8px 0;
+    scroll-snap-type: x mandatory;
 }
 
 .zimage-carousel-track::-webkit-scrollbar {
@@ -185,6 +183,7 @@ input[type="color"] {
     align-items: center;
     justify-content: center;
     padding: 8px;
+    scroll-snap-align: start;
 }
 
 .zimage-card:hover,
@@ -203,26 +202,6 @@ input[type="color"] {
     object-position: center;
 }
 
-.carousel-arrow {
-    width: 44px;
-    height: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(150, 150, 150, 0.7);
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.88);
-    color: #333;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
-}
-
-.carousel-arrow:hover {
-    background-color: rgba(240, 240, 240, 0.95);
-    border-color: rgba(120, 120, 120, 0.85);
-    transform: scale(1.03);
-}
 
 button {
     width: 100%;

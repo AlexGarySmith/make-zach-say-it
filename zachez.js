@@ -91,31 +91,6 @@ function buildZemeGallery(imageUrls) {
     });
 }
 
-function scrollCarousel(track, direction = 1) {
-    if (!track) return;
-
-    const cards = Array.from(track.querySelectorAll('.zimage-card'));
-    if (!cards.length) return;
-
-    const maxScroll = track.scrollWidth - track.clientWidth;
-
-    // Find the card whose left edge is closest to the current scroll position
-    let currentIndex = 0;
-    let minDistance = Infinity;
-    cards.forEach((card, i) => {
-        const dist = Math.abs(card.offsetLeft - track.scrollLeft);
-        if (dist < minDistance) {
-            minDistance = dist;
-            currentIndex = i;
-        }
-    });
-
-    // Step one card in the given direction, wrapping around
-    const targetIndex = (currentIndex + direction + cards.length) % cards.length;
-    const targetCard = cards[targetIndex];
-
-    track.scrollTo({ left: Math.max(0, Math.min(maxScroll, targetCard.offsetLeft)), behavior: 'smooth' });
-}
 
 function updateGallerySelection(selectedUrl) {
     const gallery = document.getElementById('zimagesGallery');
@@ -458,14 +433,6 @@ function initializeApp() {
     if (topTextColorInput) topTextColorInput.addEventListener('input', () => drawImage(true));
     if (bottomTextColorInput) bottomTextColorInput.addEventListener('input', () => drawImage(true));
     if (downloadBtn) downloadBtn.addEventListener('click', downloadImage);
-
-    document.querySelectorAll('.zimage-carousel').forEach((carousel) => {
-        const track = carousel.querySelector('.zimage-carousel-track');
-        const carouselPrev = carousel.querySelector('.carousel-arrow.prev');
-        const carouselNext = carousel.querySelector('.carousel-arrow.next');
-        if (carouselPrev) carouselPrev.addEventListener('click', () => scrollCarousel(track, -1));
-        if (carouselNext) carouselNext.addEventListener('click', () => scrollCarousel(track, 1));
-    });
 
     if (canvas) {
         canvas.addEventListener('mousedown', (e) => {
