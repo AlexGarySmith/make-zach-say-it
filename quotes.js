@@ -7,11 +7,12 @@ const QUOTE_CONFIG = {
 const FALLBACK_QUOTES = [
     {
         quote: 'The Zachronomicon says there are no Zach-isms.',
-        context: 'That cant be right.'
+        context: "That can't be right."
     }
 ];
 
 let allQuotes = [];
+let currentQuoteIndex = 0;
 
 function isConfiguredUrl(value) {
     return Boolean(value) && !String(value).includes('PASTE_');
@@ -121,13 +122,13 @@ function updateQuoteDisplay(entry) {
     }
 }
 
-function showRandomQuote() {
+function showNextQuote() {
     if (!allQuotes.length) {
-        allQuotes = [...FALLBACK_QUOTES];
+        allQuotes = shuffleArray([...FALLBACK_QUOTES]);
     }
 
-    const entry = allQuotes[Math.floor(Math.random() * allQuotes.length)];
-    updateQuoteDisplay(entry);
+    updateQuoteDisplay(allQuotes[currentQuoteIndex]);
+    currentQuoteIndex = (currentQuoteIndex + 1) % allQuotes.length;
 }
 
 function updateQuoteLinks() {
@@ -186,6 +187,7 @@ async function loadQuotesFromGoogleSheet() {
         }
 
         allQuotes = shuffleArray(normalizedQuotes);
+        currentQuoteIndex = 0;
         if (status) {
             status.textContent = `There are currently ${allQuotes.length} Zach-isms in the Zachronomicon.`;
         }
@@ -201,11 +203,11 @@ async function loadQuotesFromGoogleSheet() {
 async function initializeQuotesPage() {
     updateQuoteLinks();
     await loadQuotesFromGoogleSheet();
-    showRandomQuote();
+    showNextQuote();
 
     const newQuoteBtn = document.getElementById('newQuoteBtn');
     if (newQuoteBtn) {
-        newQuoteBtn.addEventListener('click', showRandomQuote);
+        newQuoteBtn.addEventListener('click', showNextQuote);
     }
 }
 
