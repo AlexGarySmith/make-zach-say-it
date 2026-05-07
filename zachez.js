@@ -97,27 +97,24 @@ function scrollCarousel(track, direction = 1) {
     const cards = Array.from(track.querySelectorAll('.zimage-card'));
     if (!cards.length) return;
 
-    const trackWidth = track.clientWidth;
-    const trackCenter = track.scrollLeft + trackWidth / 2;
-    const maxScroll = track.scrollWidth - trackWidth;
+    const maxScroll = track.scrollWidth - track.clientWidth;
 
-    // Find the card whose center is closest to the track's visible center
-    let centeredIndex = 0;
+    // Find the card whose left edge is closest to the current scroll position
+    let currentIndex = 0;
     let minDistance = Infinity;
     cards.forEach((card, i) => {
-        const dist = Math.abs((card.offsetLeft + card.offsetWidth / 2) - trackCenter);
+        const dist = Math.abs(card.offsetLeft - track.scrollLeft);
         if (dist < minDistance) {
             minDistance = dist;
-            centeredIndex = i;
+            currentIndex = i;
         }
     });
 
     // Step one card in the given direction, wrapping around
-    const targetIndex = (centeredIndex + direction + cards.length) % cards.length;
+    const targetIndex = (currentIndex + direction + cards.length) % cards.length;
     const targetCard = cards[targetIndex];
-    const scrollTarget = targetCard.offsetLeft + targetCard.offsetWidth / 2 - trackWidth / 2;
 
-    track.scrollTo({ left: Math.max(0, Math.min(maxScroll, scrollTarget)), behavior: 'smooth' });
+    track.scrollTo({ left: Math.max(0, Math.min(maxScroll, targetCard.offsetLeft)), behavior: 'smooth' });
 }
 
 function updateGallerySelection(selectedUrl) {
