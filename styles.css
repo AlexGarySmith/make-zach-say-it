@@ -471,3 +471,9 @@ canvas {
         min-height: 0;
     }
 }
+
+#footer-sections {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
