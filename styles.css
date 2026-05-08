@@ -210,10 +210,12 @@ button:hover {
 /* File input styling */
 .control-group input[type="file"] {
     width: 100%;
+    max-width: 100%;
     padding: 6px 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     background: #fff;
+    box-sizing: border-box;
 }
 
 .control-group small {
