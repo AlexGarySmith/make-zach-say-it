@@ -340,6 +340,7 @@ canvas {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
     padding: 10px 16px;
     border-radius: 4px;
     background: #e8e8e8;
@@ -449,6 +450,7 @@ canvas {
         display: flex;
         flex-direction: column;
         overflow-y: auto;
+        overscroll-behavior: contain;
     }
 
     .quote-form-section.is-open #quoteFormFrame {

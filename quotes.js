@@ -158,6 +158,7 @@ function updateQuoteLinks() {
             submitBtn.addEventListener('click', () => {
                 formSection.hidden = false;
                 formSection.classList.add('is-open');
+                document.body.style.overflow = 'hidden';
             });
         }
 
@@ -165,6 +166,7 @@ function updateQuoteLinks() {
             closeBtn.addEventListener('click', () => {
                 formSection.classList.remove('is-open');
                 formSection.hidden = true;
+                document.body.style.overflow = '';
             });
         }
     }
