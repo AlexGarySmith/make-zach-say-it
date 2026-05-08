@@ -95,7 +95,6 @@ function normalizeQuoteRow(row) {
 function updateQuoteDisplay(entry) {
     const quoteText = document.getElementById('quoteText');
     const quoteContext = document.getElementById('quoteContext');
-    const quoteMeta = document.getElementById('quoteMeta');
 
     if (!quoteText || !entry) return;
 
@@ -108,16 +107,6 @@ function updateQuoteDisplay(entry) {
         } else {
             quoteContext.hidden = true;
             quoteContext.textContent = '';
-        }
-    }
-
-    if (quoteMeta) {
-        if (entry.date) {
-            quoteMeta.hidden = false;
-            quoteMeta.textContent = entry.date;
-        } else {
-            quoteMeta.hidden = true;
-            quoteMeta.textContent = '';
         }
     }
 }
