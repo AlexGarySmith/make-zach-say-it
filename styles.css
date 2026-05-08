@@ -95,8 +95,6 @@ canvas {
 
 .color-item {
     flex: 0 0 auto;
-    width: 120px;
-    min-width: 120px;
 }
 
 label {
@@ -408,11 +406,6 @@ canvas {
     .control-row {
         grid-template-columns: 1fr auto;
         gap: 10px 12px;
-    }
-
-    .color-item {
-        width: 100px;
-        min-width: 100px;
     }
 
     input[type="color"] {
